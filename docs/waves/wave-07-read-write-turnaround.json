@@ -1,0 +1,66 @@
+{
+  "signal": [
+    {
+      "name": "clk",
+      "wave": "p..................."
+    },
+    {
+      "name": "direction FSM",
+      "wave": "3....6...4..........",
+      "data": [
+        "READ",
+        "TO_WRITE  (t_rtw)",
+        "WRITE"
+      ]
+    },
+    {
+      "name": "dfi_col_cmd",
+      "wave": "22222=...444444.....",
+      "data": [
+        "RD",
+        "RD",
+        "RD",
+        "RD",
+        "RD",
+        "--- bus turning ---",
+        "WR",
+        "WR",
+        "WR",
+        "WR",
+        "WR",
+        "... 123 more"
+      ]
+    },
+    {
+      "name": "DQ[31:0]",
+      "wave": "33333x...444444.....",
+      "data": [
+        "R",
+        "R",
+        "R",
+        "R",
+        "R",
+        "W",
+        "W",
+        "W",
+        "W",
+        "W",
+        "W"
+      ]
+    },
+    {
+      "name": "bus doing useful work?",
+      "wave": "1....0...1.........."
+    }
+  ],
+  "config": {
+    "hscale": 0.95
+  },
+  "head": {
+    "text": "Timing 7 - Read/write turnaround burns dead bus",
+    "tick": 0
+  },
+  "foot": {
+    "text": "The DQ bus is bidirectional, so every direction change wastes ~12 ns. This is exactly why the direction FSM drains 128 writes at a time instead of interleaving per request."
+  }
+}

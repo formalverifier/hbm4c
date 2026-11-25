@@ -1,0 +1,25 @@
+# Level and bounds properties prove unbounded.  The ORDER properties
+# (p_order_first / p_order_second) remain BMC-bounded -- see ASSUMPTIONS.md
+# OPEN-6, which now records a Rev 1.1 attempt to close them and why it failed.
+# Depth 12 covers complete fill and drain cycles of the 8-deep configuration.
+# Reported as bounded, never as proved.
+[tasks]
+bmc
+cover
+
+[options]
+bmc:   mode bmc
+bmc:   depth 12
+cover: mode cover
+cover: depth 16
+multiclock off
+
+[engines]
+smtbmc yices
+
+[script]
+read -formal rdfifo.v
+prep -top fv_rd_ptr_fifo
+
+[files]
+build/rdfifo.v

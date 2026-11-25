@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="912" height="374" viewBox="0 0 912 374">
+<defs>
+<pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="6" height="6" fill="#eef1f5"/><line x1="0" y1="0" x2="0" y2="6" stroke="#aab6c3" stroke-width="2"/></pattern>
+<marker id="wr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#b85450"/></marker>
+<marker id="wl" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#b85450"/></marker>
+</defs>
+<rect x="0" y="0" width="912" height="374" fill="#ffffff"/>
+<text x="14" y="24" font-family="Helvetica,Arial,sans-serif" font-size="15" font-weight="700" fill="#16202c">Timing 5 - DFI steady state: all three constraints, visible at once</text>
+<path d="M 178 34 L 178 344" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="200" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">0</text>
+<path d="M 222 34 L 222 344" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="244" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">1</text>
+<path d="M 266 34 L 266 344" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="288" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">2</text>
+<path d="M 310 34 L 310 344" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="332" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">3</text>
+<path d="M 354 34 L 354 344" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="376" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">4</text>
+<path d="M 398 34 L 398 344" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="420" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">5</text>
+<path d="M 442 34 L 442 344" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="464" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">6</text>
+<path d="M 486 34 L 486 344" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="508" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">7</text>
+<path d="M 530 34 L 530 344" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="552" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">8</text>
+<path d="M 574 34 L 574 344" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="596" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">9</text>
+<path d="M 618 34 L 618 344" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="640" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">10</text>
+<path d="M 662 34 L 662 344" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="684" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">11</text>
+<path d="M 706 34 L 706 344" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="728" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">12</text>
+<path d="M 750 34 L 750 344" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="772" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">13</text>
+<path d="M 794 34 L 794 344" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="816" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">14</text>
+<path d="M 838 34 L 838 344" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="860" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">15</text>
+<path d="M 882 34 L 882 344" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="166" y="63" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11.5" fill="#16202c" text-anchor="end">clk</text>
+<path d="M 178 72 L 178 46 L 200 46 L 200 72 L 222 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<path d="M 222 72 L 222 46 L 244 46 L 244 72 L 266 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<path d="M 266 72 L 266 46 L 288 46 L 288 72 L 310 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<path d="M 310 72 L 310 46 L 332 46 L 332 72 L 354 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<path d="M 354 72 L 354 46 L 376 46 L 376 72 L 398 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<path d="M 398 72 L 398 46 L 420 46 L 420 72 L 442 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<path d="M 442 72 L 442 46 L 464 46 L 464 72 L 486 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<path d="M 486 72 L 486 46 L 508 46 L 508 72 L 530 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<path d="M 530 72 L 530 46 L 552 46 L 552 72 L 574 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<path d="M 574 72 L 574 46 L 596 46 L 596 72 L 618 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<path d="M 618 72 L 618 46 L 640 46 L 640 72 L 662 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<path d="M 662 72 L 662 46 L 684 46 L 684 72 L 706 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<path d="M 706 72 L 706 46 L 728 46 L 728 72 L 750 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<path d="M 750 72 L 750 46 L 772 46 L 772 72 L 794 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<path d="M 794 72 L 794 46 L 816 46 L 816 72 L 838 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<path d="M 838 72 L 838 46 L 860 46 L 860 72 L 882 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<text x="8" y="109" font-family="Helvetica,Arial,sans-serif" font-size="11.5" font-weight="700" fill="#41546b">ROW command bus  -  independent (C3)</text>
+<path d="M 8 115 L 892 115" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="166" y="133" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11.5" fill="#16202c" text-anchor="end">dfi_row_cmd</text>
+<path d="M 183 116 L 261 116 L 266 129 L 261 142 L 183 142 L 178 129 Z" fill="#ffffff" stroke="#7a869a" stroke-width="1.5"/>
+<text x="222" y="133" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">--</text>
+<path d="M 271 116 L 305 116 L 310 129 L 305 142 L 271 142 L 266 129 Z" fill="#ffe6cc" stroke="#d79b00" stroke-width="1.5"/>
+<text x="288" y="133" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">ACT b12</text>
+<path d="M 315 116 L 437 116 L 442 129 L 437 142 L 315 142 L 310 129 Z" fill="#ffffff" stroke="#7a869a" stroke-width="1.5"/>
+<text x="376" y="133" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">--</text>
+<path d="M 447 116 L 481 116 L 486 129 L 481 142 L 447 142 L 442 129 Z" fill="#ffe6cc" stroke="#d79b00" stroke-width="1.5"/>
+<text x="464" y="133" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">ACT b13</text>
+<path d="M 491 116 L 613 116 L 618 129 L 613 142 L 491 142 L 486 129 Z" fill="#ffffff" stroke="#7a869a" stroke-width="1.5"/>
+<text x="552" y="133" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">--</text>
+<path d="M 623 116 L 657 116 L 662 129 L 657 142 L 623 142 L 618 129 Z" fill="#ffe6cc" stroke="#d79b00" stroke-width="1.5"/>
+<text x="640" y="133" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">ACT b14</text>
+<path d="M 667 116 L 789 116 L 794 129 L 789 142 L 667 142 L 662 129 Z" fill="#ffffff" stroke="#7a869a" stroke-width="1.5"/>
+<text x="728" y="133" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">--</text>
+<path d="M 799 116 L 833 116 L 838 129 L 833 142 L 799 142 L 794 129 Z" fill="#ffe6cc" stroke="#d79b00" stroke-width="1.5"/>
+<text x="816" y="133" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">ACT b15</text>
+<path d="M 843 116 L 877 116 L 882 129 L 877 142 L 843 142 L 838 129 Z" fill="#ffffff" stroke="#7a869a" stroke-width="1.5"/>
+<text x="860" y="133" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">--</text>
+<text x="8" y="179" font-family="Helvetica,Arial,sans-serif" font-size="11.5" font-weight="700" fill="#41546b">COLUMN command bus  -  one command per clock (C1)</text>
+<path d="M 8 185 L 892 185" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="166" y="203" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11.5" fill="#16202c" text-anchor="end">dfi_col_cmd</text>
+<path d="M 183 186 L 217 186 L 222 199 L 217 212 L 183 212 L 178 199 Z" fill="#dae8fc" stroke="#6c8ebf" stroke-width="1.5"/>
+<text x="200" y="203" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">RD b0</text>
+<path d="M 227 186 L 261 186 L 266 199 L 261 212 L 227 212 L 222 199 Z" fill="#d5e8d4" stroke="#82b366" stroke-width="1.5"/>
+<text x="244" y="203" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">RD b8</text>
+<path d="M 271 186 L 305 186 L 310 199 L 305 212 L 271 212 L 266 199 Z" fill="#ffe6cc" stroke="#d79b00" stroke-width="1.5"/>
+<text x="288" y="203" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">RD b16</text>
+<path d="M 315 186 L 349 186 L 354 199 L 349 212 L 315 212 L 310 199 Z" fill="#e1d5e7" stroke="#9673a6" stroke-width="1.5"/>
+<text x="332" y="203" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">RD b24</text>
+<path d="M 359 186 L 393 186 L 398 199 L 393 212 L 359 212 L 354 199 Z" fill="#dae8fc" stroke="#6c8ebf" stroke-width="1.5"/>
+<text x="376" y="203" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">RD b1</text>
+<path d="M 403 186 L 437 186 L 442 199 L 437 212 L 403 212 L 398 199 Z" fill="#d5e8d4" stroke="#82b366" stroke-width="1.5"/>
+<text x="420" y="203" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">RD b9</text>
+<path d="M 447 186 L 481 186 L 486 199 L 481 212 L 447 212 L 442 199 Z" fill="#ffe6cc" stroke="#d79b00" stroke-width="1.5"/>
+<text x="464" y="203" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">RD b17</text>
+<path d="M 491 186 L 525 186 L 530 199 L 525 212 L 491 212 L 486 199 Z" fill="#e1d5e7" stroke="#9673a6" stroke-width="1.5"/>
+<text x="508" y="203" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">RD b25</text>
+<path d="M 535 186 L 569 186 L 574 199 L 569 212 L 535 212 L 530 199 Z" fill="#dae8fc" stroke="#6c8ebf" stroke-width="1.5"/>
+<text x="552" y="203" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">RD b2</text>
+<path d="M 579 186 L 613 186 L 618 199 L 613 212 L 579 212 L 574 199 Z" fill="#d5e8d4" stroke="#82b366" stroke-width="1.5"/>
+<text x="596" y="203" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">RD b10</text>
+<path d="M 623 186 L 657 186 L 662 199 L 657 212 L 623 212 L 618 199 Z" fill="#ffe6cc" stroke="#d79b00" stroke-width="1.5"/>
+<text x="640" y="203" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">RD b18</text>
+<path d="M 667 186 L 701 186 L 706 199 L 701 212 L 667 212 L 662 199 Z" fill="#e1d5e7" stroke="#9673a6" stroke-width="1.5"/>
+<text x="684" y="203" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">RD b26</text>
+<path d="M 711 186 L 745 186 L 750 199 L 745 212 L 711 212 L 706 199 Z" fill="#dae8fc" stroke="#6c8ebf" stroke-width="1.5"/>
+<text x="728" y="203" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">RD b3</text>
+<path d="M 755 186 L 789 186 L 794 199 L 789 212 L 755 212 L 750 199 Z" fill="#d5e8d4" stroke="#82b366" stroke-width="1.5"/>
+<text x="772" y="203" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">RD b11</text>
+<path d="M 799 186 L 833 186 L 838 199 L 833 212 L 799 212 L 794 199 Z" fill="#ffe6cc" stroke="#d79b00" stroke-width="1.5"/>
+<text x="816" y="203" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">RD b19</text>
+<path d="M 843 186 L 877 186 L 882 199 L 877 212 L 843 212 L 838 199 Z" fill="#e1d5e7" stroke="#9673a6" stroke-width="1.5"/>
+<text x="860" y="203" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">RD b27</text>
+<text x="166" y="245" font-family="Helvetica,Arial,sans-serif" font-size="11.5" fill="#16202c" text-anchor="end">bank group</text>
+<path d="M 183 228 L 217 228 L 222 241 L 217 254 L 183 254 L 178 241 Z" fill="#dae8fc" stroke="#6c8ebf" stroke-width="1.5"/>
+<text x="200" y="245" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">BG0</text>
+<path d="M 227 228 L 261 228 L 266 241 L 261 254 L 227 254 L 222 241 Z" fill="#d5e8d4" stroke="#82b366" stroke-width="1.5"/>
+<text x="244" y="245" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">BG1</text>
+<path d="M 271 228 L 305 228 L 310 241 L 305 254 L 271 254 L 266 241 Z" fill="#ffe6cc" stroke="#d79b00" stroke-width="1.5"/>
+<text x="288" y="245" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">BG2</text>
+<path d="M 315 228 L 349 228 L 354 241 L 349 254 L 315 254 L 310 241 Z" fill="#e1d5e7" stroke="#9673a6" stroke-width="1.5"/>
+<text x="332" y="245" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">BG3</text>
+<path d="M 359 228 L 393 228 L 398 241 L 393 254 L 359 254 L 354 241 Z" fill="#dae8fc" stroke="#6c8ebf" stroke-width="1.5"/>
+<text x="376" y="245" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">BG0</text>
+<path d="M 403 228 L 437 228 L 442 241 L 437 254 L 403 254 L 398 241 Z" fill="#d5e8d4" stroke="#82b366" stroke-width="1.5"/>
+<text x="420" y="245" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">BG1</text>
+<path d="M 447 228 L 481 228 L 486 241 L 481 254 L 447 254 L 442 241 Z" fill="#ffe6cc" stroke="#d79b00" stroke-width="1.5"/>
+<text x="464" y="245" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">BG2</text>
+<path d="M 491 228 L 525 228 L 530 241 L 525 254 L 491 254 L 486 241 Z" fill="#e1d5e7" stroke="#9673a6" stroke-width="1.5"/>
+<text x="508" y="245" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">BG3</text>
+<path d="M 535 228 L 569 228 L 574 241 L 569 254 L 535 254 L 530 241 Z" fill="#dae8fc" stroke="#6c8ebf" stroke-width="1.5"/>
+<text x="552" y="245" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">BG0</text>
+<path d="M 579 228 L 613 228 L 618 241 L 613 254 L 579 254 L 574 241 Z" fill="#d5e8d4" stroke="#82b366" stroke-width="1.5"/>
+<text x="596" y="245" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">BG1</text>
+<path d="M 623 228 L 657 228 L 662 241 L 657 254 L 623 254 L 618 241 Z" fill="#ffe6cc" stroke="#d79b00" stroke-width="1.5"/>
+<text x="640" y="245" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">BG2</text>
+<path d="M 667 228 L 701 228 L 706 241 L 701 254 L 667 254 L 662 241 Z" fill="#e1d5e7" stroke="#9673a6" stroke-width="1.5"/>
+<text x="684" y="245" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">BG3</text>
+<path d="M 711 228 L 745 228 L 750 241 L 745 254 L 711 254 L 706 241 Z" fill="#dae8fc" stroke="#6c8ebf" stroke-width="1.5"/>
+<text x="728" y="245" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">BG0</text>
+<path d="M 755 228 L 789 228 L 794 241 L 789 254 L 755 254 L 750 241 Z" fill="#d5e8d4" stroke="#82b366" stroke-width="1.5"/>
+<text x="772" y="245" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">BG1</text>
+<path d="M 799 228 L 833 228 L 838 241 L 833 254 L 799 254 L 794 241 Z" fill="#ffe6cc" stroke="#d79b00" stroke-width="1.5"/>
+<text x="816" y="245" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">BG2</text>
+<path d="M 843 228 L 877 228 L 882 241 L 877 254 L 843 254 L 838 241 Z" fill="#e1d5e7" stroke="#9673a6" stroke-width="1.5"/>
+<text x="860" y="245" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">BG3</text>
+<text x="8" y="291" font-family="Helvetica,Arial,sans-serif" font-size="11.5" font-weight="700" fill="#41546b">data bus</text>
+<path d="M 8 297 L 892 297" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="166" y="315" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11.5" fill="#16202c" text-anchor="end">DQ[31:0]</text>
+<path d="M 183 298 L 877 298 L 882 311 L 877 324 L 183 324 L 178 311 Z" fill="#d5e8d4" stroke="#82b366" stroke-width="1.5"/>
+<text x="530" y="315" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">32 B every clock   -   100% bus utilisation</text>
+<text x="376" y="360" font-family="Helvetica,Arial,sans-serif" font-size="10.5" fill="#6b7a8a" text-anchor="middle">ACTs for banks the stream needs in ~tRCD, on the OTHER bus</text>
+<text x="728" y="360" font-family="Helvetica,Arial,sans-serif" font-size="10.5" fill="#6b7a8a" text-anchor="middle">not one column slot wasted</text>
+<text x="14" y="364" font-family="Helvetica,Arial,sans-serif" font-size="11.5" fill="#5a6a7a">The picture worth memorising. C1: exactly one column command per clock. C2: the bank group changes every clock (see the colours). C3: the row bus issues ACTs in parallel, for free.</text>
+</svg>

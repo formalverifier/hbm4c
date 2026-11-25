@@ -1,0 +1,64 @@
+{
+  "signal": [
+    {
+      "name": "clk",
+      "wave": "p..............."
+    },
+    {
+      "name": "dfi_col_cmd",
+      "wave": "23452342=2=2=2=2",
+      "data": [
+        "RD BG0",
+        "RD BG1",
+        "RD BG2",
+        "RD BG3",
+        "RD BG0",
+        "RD BG1",
+        "RD BG2",
+        "RD BG0",
+        "--",
+        "RD BG0",
+        "--",
+        "RD BG0",
+        "--",
+        "RD BG0",
+        "--",
+        "RD BG0"
+      ]
+    },
+    {
+      "name": "DQ[31:0]",
+      "wave": "3......3=3=3=3=3",
+      "data": [
+        "busy every clock",
+        "32B",
+        "",
+        "32B",
+        "",
+        "32B",
+        "",
+        "32B",
+        "",
+        "32B"
+      ]
+    },
+    {
+      "name": "effective BW",
+      "wave": "3......6........",
+      "data": [
+        "32 GB/s   (100%)",
+        "16 GB/s   (50%)"
+      ]
+    }
+  ],
+  "config": {
+    "hscale": 1.0
+  },
+  "head": {
+    "text": "Timing 6 - Why the address map alternates bank groups (C2)",
+    "tick": 0
+  },
+  "foot": {
+    "text": "Left: consecutive commands to DIFFERENT bank groups obey tCCD_S = 1 clock and the bus stays full. Right: the SAME bank group forces tCCD_L = 2 clocks and half the bandwidth disappears."
+  }
+}

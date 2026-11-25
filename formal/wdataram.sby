@@ -1,0 +1,37 @@
+# Write-data storage: data integrity, flag agreement, and no-data reporting.
+#
+# BMC, not prove, and the reason is specific. p_flag_agrees, p_no_data_flagged
+# and p_no_false_alarm depend only on the written-vector, which the DUT exports
+# as dbg_written -- those are inductive. p_data_integrity is not, because it
+# needs "for EVERY entry, the array holds what was written there", and the array
+# is only observable through the addressed read port. Stating it for the read
+# tag alone leaves the induction step free to start from a state where some
+# OTHER entry already disagrees.
+#
+# Making the array observable would close it -- and would cost a TQ_DEPTH:1 mux
+# of 256 bits in silicon, for a block this small. Not worth it. The same
+# technique was tried and reverted on hbm4_rd_ptr_fifo for the same reason
+# (ASSUMPTIONS.md OPEN-6); recorded here as OPEN-12 rather than left implicit.
+#
+# Depth 16 covers write, read-back, tag reuse and the no-data path several times
+# over for a 4-entry configuration.
+[tasks]
+bmc
+cover
+
+[options]
+bmc: mode bmc
+bmc: depth 16
+cover: mode cover
+cover: depth 12
+multiclock off
+
+[engines]
+smtbmc yices
+
+[script]
+read -formal wdataram.v
+prep -top fv_wdata_ram
+
+[files]
+build/wdataram.v

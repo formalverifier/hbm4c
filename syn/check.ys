@@ -1,0 +1,4 @@
+read_verilog -sv build/slice.v
+hierarchy -top hbm4_pc_slice
+proc; opt; fsm; opt; memory; opt
+check -assert

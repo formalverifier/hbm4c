@@ -1,0 +1,22 @@
+# Purely combinational: BMC depth 1 is a COMPLETE proof over all data values
+# and all error positions simultaneously.
+[tasks]
+bmc
+cover
+
+[options]
+bmc:   mode bmc
+bmc:   depth 1
+cover: mode cover
+cover: depth 1
+multiclock off
+
+[engines]
+smtbmc yices
+
+[script]
+read -formal ecc.v
+prep -top fv_sys_ecc
+
+[files]
+build/ecc.v

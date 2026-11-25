@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="912" height="248" viewBox="0 0 912 248">
+<defs>
+<pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="6" height="6" fill="#eef1f5"/><line x1="0" y1="0" x2="0" y2="6" stroke="#aab6c3" stroke-width="2"/></pattern>
+<marker id="wr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#b85450"/></marker>
+<marker id="wl" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#b85450"/></marker>
+</defs>
+<rect x="0" y="0" width="912" height="248" fill="#ffffff"/>
+<text x="14" y="24" font-family="Helvetica,Arial,sans-serif" font-size="15" font-weight="700" fill="#16202c">Timing 6 - Why the address map alternates bank groups (C2)</text>
+<path d="M 178 34 L 178 218" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="200" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">0</text>
+<path d="M 222 34 L 222 218" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="244" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">1</text>
+<path d="M 266 34 L 266 218" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="288" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">2</text>
+<path d="M 310 34 L 310 218" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="332" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">3</text>
+<path d="M 354 34 L 354 218" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="376" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">4</text>
+<path d="M 398 34 L 398 218" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="420" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">5</text>
+<path d="M 442 34 L 442 218" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="464" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">6</text>
+<path d="M 486 34 L 486 218" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="508" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">7</text>
+<path d="M 530 34 L 530 218" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="552" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">8</text>
+<path d="M 574 34 L 574 218" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="596" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">9</text>
+<path d="M 618 34 L 618 218" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="640" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">10</text>
+<path d="M 662 34 L 662 218" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="684" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">11</text>
+<path d="M 706 34 L 706 218" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="728" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">12</text>
+<path d="M 750 34 L 750 218" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="772" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">13</text>
+<path d="M 794 34 L 794 218" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="816" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">14</text>
+<path d="M 838 34 L 838 218" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="860" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">15</text>
+<path d="M 882 34 L 882 218" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="166" y="63" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11.5" fill="#16202c" text-anchor="end">clk</text>
+<path d="M 178 72 L 178 46 L 200 46 L 200 72 L 222 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<path d="M 222 72 L 222 46 L 244 46 L 244 72 L 266 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<path d="M 266 72 L 266 46 L 288 46 L 288 72 L 310 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<path d="M 310 72 L 310 46 L 332 46 L 332 72 L 354 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<path d="M 354 72 L 354 46 L 376 46 L 376 72 L 398 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<path d="M 398 72 L 398 46 L 420 46 L 420 72 L 442 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<path d="M 442 72 L 442 46 L 464 46 L 464 72 L 486 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<path d="M 486 72 L 486 46 L 508 46 L 508 72 L 530 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<path d="M 530 72 L 530 46 L 552 46 L 552 72 L 574 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<path d="M 574 72 L 574 46 L 596 46 L 596 72 L 618 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<path d="M 618 72 L 618 46 L 640 46 L 640 72 L 662 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<path d="M 662 72 L 662 46 L 684 46 L 684 72 L 706 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<path d="M 706 72 L 706 46 L 728 46 L 728 72 L 750 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<path d="M 750 72 L 750 46 L 772 46 L 772 72 L 794 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<path d="M 794 72 L 794 46 L 816 46 L 816 72 L 838 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<path d="M 838 72 L 838 46 L 860 46 L 860 72 L 882 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<text x="166" y="105" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11.5" fill="#16202c" text-anchor="end">dfi_col_cmd</text>
+<path d="M 183 88 L 217 88 L 222 101 L 217 114 L 183 114 L 178 101 Z" fill="#dae8fc" stroke="#6c8ebf" stroke-width="1.5"/>
+<text x="200" y="105" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">RD BG0</text>
+<path d="M 227 88 L 261 88 L 266 101 L 261 114 L 227 114 L 222 101 Z" fill="#d5e8d4" stroke="#82b366" stroke-width="1.5"/>
+<text x="244" y="105" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">RD BG1</text>
+<path d="M 271 88 L 305 88 L 310 101 L 305 114 L 271 114 L 266 101 Z" fill="#ffe6cc" stroke="#d79b00" stroke-width="1.5"/>
+<text x="288" y="105" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">RD BG2</text>
+<path d="M 315 88 L 349 88 L 354 101 L 349 114 L 315 114 L 310 101 Z" fill="#e1d5e7" stroke="#9673a6" stroke-width="1.5"/>
+<text x="332" y="105" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">RD BG3</text>
+<path d="M 359 88 L 393 88 L 398 101 L 393 114 L 359 114 L 354 101 Z" fill="#dae8fc" stroke="#6c8ebf" stroke-width="1.5"/>
+<text x="376" y="105" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">RD BG0</text>
+<path d="M 403 88 L 437 88 L 442 101 L 437 114 L 403 114 L 398 101 Z" fill="#d5e8d4" stroke="#82b366" stroke-width="1.5"/>
+<text x="420" y="105" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">RD BG1</text>
+<path d="M 447 88 L 481 88 L 486 101 L 481 114 L 447 114 L 442 101 Z" fill="#ffe6cc" stroke="#d79b00" stroke-width="1.5"/>
+<text x="464" y="105" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">RD BG2</text>
+<path d="M 491 88 L 525 88 L 530 101 L 525 114 L 491 114 L 486 101 Z" fill="#dae8fc" stroke="#6c8ebf" stroke-width="1.5"/>
+<text x="508" y="105" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">RD BG0</text>
+<path d="M 535 88 L 569 88 L 574 101 L 569 114 L 535 114 L 530 101 Z" fill="#ffffff" stroke="#7a869a" stroke-width="1.5"/>
+<text x="552" y="105" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">--</text>
+<path d="M 579 88 L 613 88 L 618 101 L 613 114 L 579 114 L 574 101 Z" fill="#dae8fc" stroke="#6c8ebf" stroke-width="1.5"/>
+<text x="596" y="105" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">RD BG0</text>
+<path d="M 623 88 L 657 88 L 662 101 L 657 114 L 623 114 L 618 101 Z" fill="#ffffff" stroke="#7a869a" stroke-width="1.5"/>
+<text x="640" y="105" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">--</text>
+<path d="M 667 88 L 701 88 L 706 101 L 701 114 L 667 114 L 662 101 Z" fill="#dae8fc" stroke="#6c8ebf" stroke-width="1.5"/>
+<text x="684" y="105" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">RD BG0</text>
+<path d="M 711 88 L 745 88 L 750 101 L 745 114 L 711 114 L 706 101 Z" fill="#ffffff" stroke="#7a869a" stroke-width="1.5"/>
+<text x="728" y="105" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">--</text>
+<path d="M 755 88 L 789 88 L 794 101 L 789 114 L 755 114 L 750 101 Z" fill="#dae8fc" stroke="#6c8ebf" stroke-width="1.5"/>
+<text x="772" y="105" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">RD BG0</text>
+<path d="M 799 88 L 833 88 L 838 101 L 833 114 L 799 114 L 794 101 Z" fill="#ffffff" stroke="#7a869a" stroke-width="1.5"/>
+<text x="816" y="105" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">--</text>
+<path d="M 843 88 L 877 88 L 882 101 L 877 114 L 843 114 L 838 101 Z" fill="#dae8fc" stroke="#6c8ebf" stroke-width="1.5"/>
+<text x="860" y="105" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">RD BG0</text>
+<text x="166" y="147" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11.5" fill="#16202c" text-anchor="end">DQ[31:0]</text>
+<path d="M 183 130 L 481 130 L 486 143 L 481 156 L 183 156 L 178 143 Z" fill="#d5e8d4" stroke="#82b366" stroke-width="1.5"/>
+<text x="332" y="147" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">busy every clock</text>
+<path d="M 491 130 L 525 130 L 530 143 L 525 156 L 491 156 L 486 143 Z" fill="#d5e8d4" stroke="#82b366" stroke-width="1.5"/>
+<text x="508" y="147" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">32B</text>
+<path d="M 535 130 L 569 130 L 574 143 L 569 156 L 535 156 L 530 143 Z" fill="#ffffff" stroke="#7a869a" stroke-width="1.5"/>
+<path d="M 579 130 L 613 130 L 618 143 L 613 156 L 579 156 L 574 143 Z" fill="#d5e8d4" stroke="#82b366" stroke-width="1.5"/>
+<text x="596" y="147" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">32B</text>
+<path d="M 623 130 L 657 130 L 662 143 L 657 156 L 623 156 L 618 143 Z" fill="#ffffff" stroke="#7a869a" stroke-width="1.5"/>
+<path d="M 667 130 L 701 130 L 706 143 L 701 156 L 667 156 L 662 143 Z" fill="#d5e8d4" stroke="#82b366" stroke-width="1.5"/>
+<text x="684" y="147" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">32B</text>
+<path d="M 711 130 L 745 130 L 750 143 L 745 156 L 711 156 L 706 143 Z" fill="#ffffff" stroke="#7a869a" stroke-width="1.5"/>
+<path d="M 755 130 L 789 130 L 794 143 L 789 156 L 755 156 L 750 143 Z" fill="#d5e8d4" stroke="#82b366" stroke-width="1.5"/>
+<text x="772" y="147" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">32B</text>
+<path d="M 799 130 L 833 130 L 838 143 L 833 156 L 799 156 L 794 143 Z" fill="#ffffff" stroke="#7a869a" stroke-width="1.5"/>
+<path d="M 843 130 L 877 130 L 882 143 L 877 156 L 843 156 L 838 143 Z" fill="#d5e8d4" stroke="#82b366" stroke-width="1.5"/>
+<text x="860" y="147" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">32B</text>
+<text x="166" y="189" font-family="Helvetica,Arial,sans-serif" font-size="11.5" fill="#16202c" text-anchor="end">effective BW</text>
+<path d="M 183 172 L 481 172 L 486 185 L 481 198 L 183 198 L 178 185 Z" fill="#d5e8d4" stroke="#82b366" stroke-width="1.5"/>
+<text x="332" y="189" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">32 GB/s   (100%)</text>
+<path d="M 491 172 L 877 172 L 882 185 L 877 198 L 491 198 L 486 185 Z" fill="#f8cecc" stroke="#b85450" stroke-width="1.5"/>
+<text x="684" y="189" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">16 GB/s   (50%)</text>
+<text x="332" y="234" font-family="Helvetica,Arial,sans-serif" font-size="10.5" fill="#6b7a8a" text-anchor="middle">tCCD_S = 1 clk: bank group alternates</text>
+<text x="684" y="234" font-family="Helvetica,Arial,sans-serif" font-size="10.5" fill="#6b7a8a" text-anchor="middle">tCCD_L = 2 clk: same bank group stalls</text>
+<text x="14" y="238" font-family="Helvetica,Arial,sans-serif" font-size="11.5" fill="#5a6a7a">Left: consecutive commands to DIFFERENT bank groups obey tCCD_S = 1 clock and the bus stays full. Right: the SAME bank group forces tCCD_L = 2 clocks and half the bandwidth disappears.</text>
+</svg>

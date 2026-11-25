@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1044" height="386" viewBox="0 0 1044 386">
+<defs>
+<pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="6" height="6" fill="#eef1f5"/><line x1="0" y1="0" x2="0" y2="6" stroke="#aab6c3" stroke-width="2"/></pattern>
+<marker id="wr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#b85450"/></marker>
+<marker id="wl" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#b85450"/></marker>
+</defs>
+<rect x="0" y="0" width="1044" height="386" fill="#ffffff"/>
+<text x="14" y="24" font-family="Helvetica,Arial,sans-serif" font-size="15" font-weight="700" fill="#16202c">Timing 2 - Responses return out of order</text>
+<path d="M 178 34 L 178 356" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="198.9" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">0</text>
+<path d="M 219.8 34 L 219.8 356" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="240.7" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">1</text>
+<path d="M 261.6 34 L 261.6 356" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="282.5" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">2</text>
+<path d="M 303.4 34 L 303.4 356" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="324.3" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">3</text>
+<path d="M 345.2 34 L 345.2 356" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="366.1" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">4</text>
+<path d="M 387 34 L 387 356" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="407.9" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">5</text>
+<path d="M 428.8 34 L 428.8 356" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="449.7" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">6</text>
+<path d="M 470.6 34 L 470.6 356" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="491.5" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">7</text>
+<path d="M 512.4 34 L 512.4 356" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="533.3" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">8</text>
+<path d="M 554.2 34 L 554.2 356" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="575.1" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">9</text>
+<path d="M 596 34 L 596 356" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="616.9" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">10</text>
+<path d="M 637.8 34 L 637.8 356" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="658.7" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">11</text>
+<path d="M 679.6 34 L 679.6 356" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="700.5" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">12</text>
+<path d="M 721.4 34 L 721.4 356" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="742.3" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">13</text>
+<path d="M 763.2 34 L 763.2 356" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="784.1" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">14</text>
+<path d="M 805 34 L 805 356" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="825.9" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">15</text>
+<path d="M 846.8 34 L 846.8 356" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="867.7" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">16</text>
+<path d="M 888.6 34 L 888.6 356" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="909.5" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">17</text>
+<path d="M 930.4 34 L 930.4 356" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="951.3" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">18</text>
+<path d="M 972.2 34 L 972.2 356" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="993.1" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">19</text>
+<path d="M 1014 34 L 1014 356" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="166" y="63" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11.5" fill="#16202c" text-anchor="end">clk</text>
+<path d="M 178 72 L 178 46 L 198.9 46 L 198.9 72 L 219.8 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<path d="M 219.8 72 L 219.8 46 L 240.7 46 L 240.7 72 L 261.6 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<path d="M 261.6 72 L 261.6 46 L 282.5 46 L 282.5 72 L 303.4 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<path d="M 303.4 72 L 303.4 46 L 324.3 46 L 324.3 72 L 345.2 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<path d="M 345.2 72 L 345.2 46 L 366.1 46 L 366.1 72 L 387 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<path d="M 387 72 L 387 46 L 407.9 46 L 407.9 72 L 428.8 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<path d="M 428.8 72 L 428.8 46 L 449.7 46 L 449.7 72 L 470.6 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<path d="M 470.6 72 L 470.6 46 L 491.5 46 L 491.5 72 L 512.4 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<path d="M 512.4 72 L 512.4 46 L 533.3 46 L 533.3 72 L 554.2 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<path d="M 554.2 72 L 554.2 46 L 575.1 46 L 575.1 72 L 596 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<path d="M 596 72 L 596 46 L 616.9 46 L 616.9 72 L 637.8 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<path d="M 637.8 72 L 637.8 46 L 658.7 46 L 658.7 72 L 679.6 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<path d="M 679.6 72 L 679.6 46 L 700.5 46 L 700.5 72 L 721.4 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<path d="M 721.4 72 L 721.4 46 L 742.3 46 L 742.3 72 L 763.2 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<path d="M 763.2 72 L 763.2 46 L 784.1 46 L 784.1 72 L 805 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<path d="M 805 72 L 805 46 L 825.9 46 L 825.9 72 L 846.8 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<path d="M 846.8 72 L 846.8 46 L 867.7 46 L 867.7 72 L 888.6 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<path d="M 888.6 72 L 888.6 46 L 909.5 46 L 909.5 72 L 930.4 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<path d="M 930.4 72 L 930.4 46 L 951.3 46 L 951.3 72 L 972.2 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<path d="M 972.2 72 L 972.2 46 L 993.1 46 L 993.1 72 L 1014 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<text x="166" y="105" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11.5" fill="#16202c" text-anchor="end">req_valid</text>
+<path d="M 178 114 L 219.8 114" fill="none" stroke="#2b3a4a" stroke-width="1.8"/>
+<path d="M 219.8 88 L 261.6 88" fill="none" stroke="#2b3a4a" stroke-width="1.8"/>
+<path d="M 261.6 88 L 303.4 88" fill="none" stroke="#2b3a4a" stroke-width="1.8"/>
+<path d="M 303.4 88 L 345.2 88" fill="none" stroke="#2b3a4a" stroke-width="1.8"/>
+<path d="M 345.2 114 L 1014 114" fill="none" stroke="#2b3a4a" stroke-width="1.8"/>
+<path d="M 216.8 114 L 222.8 88" fill="none" stroke="#2b3a4a" stroke-width="1.8"/>
+<path d="M 342.2 88 L 348.2 114" fill="none" stroke="#2b3a4a" stroke-width="1.8"/>
+<path d="M 487.5 117 q 7 -16 0 -16 q -7 -16 0 -16" fill="none" stroke="#b85450" stroke-width="1.8"/>
+<path d="M 495.5 117 q 7 -16 0 -16 q -7 -16 0 -16" fill="none" stroke="#b85450" stroke-width="1.8"/>
+<text x="166" y="147" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11.5" fill="#16202c" text-anchor="end">req_tag[7:0]</text>
+<rect x="178" y="130" width="41.8" height="26" fill="url(#hatch)" stroke="#2b3a4a" stroke-width="1.4"/>
+<path d="M 224.8 130 L 256.6 130 L 261.6 143 L 256.6 156 L 224.8 156 L 219.8 143 Z" fill="#ffffff" stroke="#7a869a" stroke-width="1.5"/>
+<text x="240.7" y="147" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">07</text>
+<path d="M 266.6 130 L 298.4 130 L 303.4 143 L 298.4 156 L 266.6 156 L 261.6 143 Z" fill="#ffffff" stroke="#7a869a" stroke-width="1.5"/>
+<text x="282.5" y="147" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">08</text>
+<path d="M 308.4 130 L 340.2 130 L 345.2 143 L 340.2 156 L 308.4 156 L 303.4 143 Z" fill="#ffffff" stroke="#7a869a" stroke-width="1.5"/>
+<text x="324.3" y="147" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">09</text>
+<rect x="345.2" y="130" width="668.8" height="26" fill="url(#hatch)" stroke="#2b3a4a" stroke-width="1.4"/>
+<path d="M 487.5 159 q 7 -16 0 -16 q -7 -16 0 -16" fill="none" stroke="#b85450" stroke-width="1.8"/>
+<path d="M 495.5 159 q 7 -16 0 -16 q -7 -16 0 -16" fill="none" stroke="#b85450" stroke-width="1.8"/>
+<text x="166" y="189" font-family="Helvetica,Arial,sans-serif" font-size="11.5" fill="#16202c" text-anchor="end">row hit?</text>
+<rect x="178" y="172" width="41.8" height="26" fill="url(#hatch)" stroke="#2b3a4a" stroke-width="1.4"/>
+<path d="M 224.8 172 L 256.6 172 L 261.6 185 L 256.6 198 L 224.8 198 L 219.8 185 Z" fill="#ffffff" stroke="#7a869a" stroke-width="1.5"/>
+<text x="240.7" y="189" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">miss</text>
+<path d="M 266.6 172 L 298.4 172 L 303.4 185 L 298.4 198 L 266.6 198 L 261.6 185 Z" fill="#ffffff" stroke="#7a869a" stroke-width="1.5"/>
+<text x="282.5" y="189" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">HIT</text>
+<path d="M 308.4 172 L 340.2 172 L 345.2 185 L 340.2 198 L 308.4 198 L 303.4 185 Z" fill="#ffffff" stroke="#7a869a" stroke-width="1.5"/>
+<text x="324.3" y="189" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">miss</text>
+<rect x="345.2" y="172" width="668.8" height="26" fill="url(#hatch)" stroke="#2b3a4a" stroke-width="1.4"/>
+<path d="M 487.5 201 q 7 -16 0 -16 q -7 -16 0 -16" fill="none" stroke="#b85450" stroke-width="1.8"/>
+<path d="M 495.5 201 q 7 -16 0 -16 q -7 -16 0 -16" fill="none" stroke="#b85450" stroke-width="1.8"/>
+<text x="166" y="243" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11.5" fill="#16202c" text-anchor="end">rsp_valid</text>
+<path d="M 178 252 L 763.2 252" fill="none" stroke="#2b3a4a" stroke-width="1.8"/>
+<path d="M 763.2 226 L 805 226" fill="none" stroke="#2b3a4a" stroke-width="1.8"/>
+<path d="M 805 226 L 846.8 226" fill="none" stroke="#2b3a4a" stroke-width="1.8"/>
+<path d="M 846.8 226 L 888.6 226" fill="none" stroke="#2b3a4a" stroke-width="1.8"/>
+<path d="M 888.6 252 L 1014 252" fill="none" stroke="#2b3a4a" stroke-width="1.8"/>
+<path d="M 760.2 252 L 766.2 226" fill="none" stroke="#2b3a4a" stroke-width="1.8"/>
+<path d="M 885.6 226 L 891.6 252" fill="none" stroke="#2b3a4a" stroke-width="1.8"/>
+<path d="M 529.3 255 q 7 -16 0 -16 q -7 -16 0 -16" fill="none" stroke="#b85450" stroke-width="1.8"/>
+<path d="M 537.3 255 q 7 -16 0 -16 q -7 -16 0 -16" fill="none" stroke="#b85450" stroke-width="1.8"/>
+<text x="166" y="285" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11.5" fill="#16202c" text-anchor="end">rsp_tag[7:0]</text>
+<rect x="178" y="268" width="585.2" height="26" fill="url(#hatch)" stroke="#2b3a4a" stroke-width="1.4"/>
+<path d="M 768.2 268 L 800 268 L 805 281 L 800 294 L 768.2 294 L 763.2 281 Z" fill="#ffffff" stroke="#7a869a" stroke-width="1.5"/>
+<text x="784.1" y="285" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">08</text>
+<path d="M 810 268 L 841.8 268 L 846.8 281 L 841.8 294 L 810 294 L 805 281 Z" fill="#ffffff" stroke="#7a869a" stroke-width="1.5"/>
+<text x="825.9" y="285" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">07</text>
+<path d="M 851.8 268 L 883.6 268 L 888.6 281 L 883.6 294 L 851.8 294 L 846.8 281 Z" fill="#ffffff" stroke="#7a869a" stroke-width="1.5"/>
+<text x="867.7" y="285" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">09</text>
+<rect x="888.6" y="268" width="125.4" height="26" fill="url(#hatch)" stroke="#2b3a4a" stroke-width="1.4"/>
+<path d="M 529.3 297 q 7 -16 0 -16 q -7 -16 0 -16" fill="none" stroke="#b85450" stroke-width="1.8"/>
+<path d="M 537.3 297 q 7 -16 0 -16 q -7 -16 0 -16" fill="none" stroke="#b85450" stroke-width="1.8"/>
+<text x="166" y="327" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11.5" fill="#16202c" text-anchor="end">rsp_data[255:0]</text>
+<rect x="178" y="310" width="585.2" height="26" fill="url(#hatch)" stroke="#2b3a4a" stroke-width="1.4"/>
+<path d="M 768.2 310 L 800 310 L 805 323 L 800 336 L 768.2 336 L 763.2 323 Z" fill="#d5e8d4" stroke="#82b366" stroke-width="1.5"/>
+<text x="784.1" y="327" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">D08</text>
+<path d="M 810 310 L 841.8 310 L 846.8 323 L 841.8 336 L 810 336 L 805 323 Z" fill="#d5e8d4" stroke="#82b366" stroke-width="1.5"/>
+<text x="825.9" y="327" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">D07</text>
+<path d="M 851.8 310 L 883.6 310 L 888.6 323 L 883.6 336 L 851.8 336 L 846.8 323 Z" fill="#d5e8d4" stroke="#82b366" stroke-width="1.5"/>
+<text x="867.7" y="327" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">D09</text>
+<rect x="888.6" y="310" width="125.4" height="26" fill="url(#hatch)" stroke="#2b3a4a" stroke-width="1.4"/>
+<path d="M 529.3 339 q 7 -16 0 -16 q -7 -16 0 -16" fill="none" stroke="#b85450" stroke-width="1.8"/>
+<path d="M 537.3 339 q 7 -16 0 -16 q -7 -16 0 -16" fill="none" stroke="#b85450" stroke-width="1.8"/>
+<text x="282.5" y="372" font-family="Helvetica,Arial,sans-serif" font-size="10.5" fill="#6b7a8a" text-anchor="middle">issued  07, 08, 09</text>
+<text x="846.8" y="372" font-family="Helvetica,Arial,sans-serif" font-size="10.5" fill="#6b7a8a" text-anchor="middle">returned  08, 07, 09</text>
+<text x="14" y="376" font-family="Helvetica,Arial,sans-serif" font-size="11.5" fill="#5a6a7a">Tags 07, 08, 09 are issued in that order. Tag 08 hit an open row, so it comes back first. The host must key on the tag, never on arrival order.</text>
+</svg>

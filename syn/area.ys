@@ -1,0 +1,7 @@
+read_verilog -sv build/slice.v
+hierarchy -top hbm4_pc_slice
+proc; opt; fsm; opt; memory; opt
+techmap; opt
+abc -g simple
+opt_clean
+tee -o rpt/area_by_module.txt stat

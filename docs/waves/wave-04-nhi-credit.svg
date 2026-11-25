@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="876.8" height="302" viewBox="0 0 876.8 302">
+<defs>
+<pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="6" height="6" fill="#eef1f5"/><line x1="0" y1="0" x2="0" y2="6" stroke="#aab6c3" stroke-width="2"/></pattern>
+<marker id="wr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#b85450"/></marker>
+<marker id="wl" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#b85450"/></marker>
+</defs>
+<rect x="0" y="0" width="876.8" height="302" fill="#ffffff"/>
+<text x="14" y="24" font-family="Helvetica,Arial,sans-serif" font-size="15" font-weight="700" fill="#16202c">Timing 4 - Credit flow control</text>
+<path d="M 178 34 L 178 272" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="198.9" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">0</text>
+<path d="M 219.8 34 L 219.8 272" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="240.7" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">1</text>
+<path d="M 261.6 34 L 261.6 272" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="282.5" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">2</text>
+<path d="M 303.4 34 L 303.4 272" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="324.3" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">3</text>
+<path d="M 345.2 34 L 345.2 272" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="366.1" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">4</text>
+<path d="M 387 34 L 387 272" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="407.9" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">5</text>
+<path d="M 428.8 34 L 428.8 272" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="449.7" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">6</text>
+<path d="M 470.6 34 L 470.6 272" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="491.5" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">7</text>
+<path d="M 512.4 34 L 512.4 272" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="533.3" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">8</text>
+<path d="M 554.2 34 L 554.2 272" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="575.1" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">9</text>
+<path d="M 596 34 L 596 272" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="616.9" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">10</text>
+<path d="M 637.8 34 L 637.8 272" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="658.7" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">11</text>
+<path d="M 679.6 34 L 679.6 272" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="700.5" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">12</text>
+<path d="M 721.4 34 L 721.4 272" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="742.3" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">13</text>
+<path d="M 763.2 34 L 763.2 272" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="784.1" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">14</text>
+<path d="M 805 34 L 805 272" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="825.9" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">15</text>
+<path d="M 846.8 34 L 846.8 272" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="166" y="63" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11.5" fill="#16202c" text-anchor="end">clk</text>
+<path d="M 178 72 L 178 46 L 198.9 46 L 198.9 72 L 219.8 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<path d="M 219.8 72 L 219.8 46 L 240.7 46 L 240.7 72 L 261.6 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<path d="M 261.6 72 L 261.6 46 L 282.5 46 L 282.5 72 L 303.4 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<path d="M 303.4 72 L 303.4 46 L 324.3 46 L 324.3 72 L 345.2 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<path d="M 345.2 72 L 345.2 46 L 366.1 46 L 366.1 72 L 387 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<path d="M 387 72 L 387 46 L 407.9 46 L 407.9 72 L 428.8 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<path d="M 428.8 72 L 428.8 46 L 449.7 46 L 449.7 72 L 470.6 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<path d="M 470.6 72 L 470.6 46 L 491.5 46 L 491.5 72 L 512.4 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<path d="M 512.4 72 L 512.4 46 L 533.3 46 L 533.3 72 L 554.2 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<path d="M 554.2 72 L 554.2 46 L 575.1 46 L 575.1 72 L 596 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<path d="M 596 72 L 596 46 L 616.9 46 L 616.9 72 L 637.8 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<path d="M 637.8 72 L 637.8 46 L 658.7 46 L 658.7 72 L 679.6 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<path d="M 679.6 72 L 679.6 46 L 700.5 46 L 700.5 72 L 721.4 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<path d="M 721.4 72 L 721.4 46 L 742.3 46 L 742.3 72 L 763.2 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<path d="M 763.2 72 L 763.2 46 L 784.1 46 L 784.1 72 L 805 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<path d="M 805 72 L 805 46 L 825.9 46 L 825.9 72 L 846.8 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<text x="166" y="105" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11.5" fill="#16202c" text-anchor="end">req_valid</text>
+<path d="M 178 114 L 219.8 114" fill="none" stroke="#2b3a4a" stroke-width="1.8"/>
+<path d="M 219.8 88 L 261.6 88" fill="none" stroke="#2b3a4a" stroke-width="1.8"/>
+<path d="M 261.6 88 L 303.4 88" fill="none" stroke="#2b3a4a" stroke-width="1.8"/>
+<path d="M 303.4 88 L 345.2 88" fill="none" stroke="#2b3a4a" stroke-width="1.8"/>
+<path d="M 345.2 88 L 387 88" fill="none" stroke="#2b3a4a" stroke-width="1.8"/>
+<path d="M 387 88 L 428.8 88" fill="none" stroke="#2b3a4a" stroke-width="1.8"/>
+<path d="M 428.8 88 L 470.6 88" fill="none" stroke="#2b3a4a" stroke-width="1.8"/>
+<path d="M 470.6 114 L 637.8 114" fill="none" stroke="#2b3a4a" stroke-width="1.8"/>
+<path d="M 637.8 88 L 679.6 88" fill="none" stroke="#2b3a4a" stroke-width="1.8"/>
+<path d="M 679.6 88 L 721.4 88" fill="none" stroke="#2b3a4a" stroke-width="1.8"/>
+<path d="M 721.4 114 L 846.8 114" fill="none" stroke="#2b3a4a" stroke-width="1.8"/>
+<path d="M 216.8 114 L 222.8 88" fill="none" stroke="#2b3a4a" stroke-width="1.8"/>
+<path d="M 467.6 88 L 473.6 114" fill="none" stroke="#2b3a4a" stroke-width="1.8"/>
+<path d="M 634.8 114 L 640.8 88" fill="none" stroke="#2b3a4a" stroke-width="1.8"/>
+<path d="M 718.4 88 L 724.4 114" fill="none" stroke="#2b3a4a" stroke-width="1.8"/>
+<text x="166" y="147" font-family="Helvetica,Arial,sans-serif" font-size="11.5" fill="#16202c" text-anchor="end">credits (host)</text>
+<path d="M 183 130 L 214.8 130 L 219.8 143 L 214.8 156 L 183 156 L 178 143 Z" fill="#ffffff" stroke="#7a869a" stroke-width="1.5"/>
+<text x="198.9" y="147" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">64</text>
+<path d="M 224.8 130 L 256.6 130 L 261.6 143 L 256.6 156 L 224.8 156 L 219.8 143 Z" fill="#ffffff" stroke="#7a869a" stroke-width="1.5"/>
+<text x="240.7" y="147" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">63</text>
+<path d="M 266.6 130 L 298.4 130 L 303.4 143 L 298.4 156 L 266.6 156 L 261.6 143 Z" fill="#ffffff" stroke="#7a869a" stroke-width="1.5"/>
+<text x="282.5" y="147" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">62</text>
+<path d="M 308.4 130 L 423.8 130 L 428.8 143 L 423.8 156 L 308.4 156 L 303.4 143 Z" fill="#ffffff" stroke="#7a869a" stroke-width="1.5"/>
+<text x="366.1" y="147" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">61</text>
+<path d="M 433.8 130 L 465.6 130 L 470.6 143 L 465.6 156 L 433.8 156 L 428.8 143 Z" fill="#ffffff" stroke="#7a869a" stroke-width="1.5"/>
+<text x="449.7" y="147" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">1</text>
+<path d="M 475.6 130 L 632.8 130 L 637.8 143 L 632.8 156 L 475.6 156 L 470.6 143 Z" fill="#f8cecc" stroke="#b85450" stroke-width="1.5"/>
+<text x="554.2" y="147" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">0</text>
+<path d="M 642.8 130 L 674.6 130 L 679.6 143 L 674.6 156 L 642.8 156 L 637.8 143 Z" fill="#ffffff" stroke="#7a869a" stroke-width="1.5"/>
+<text x="658.7" y="147" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">1</text>
+<path d="M 684.6 130 L 841.8 130 L 846.8 143 L 841.8 156 L 684.6 156 L 679.6 143 Z" fill="#f8cecc" stroke="#b85450" stroke-width="1.5"/>
+<text x="763.2" y="147" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">0</text>
+<text x="166" y="189" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11.5" fill="#16202c" text-anchor="end">req_credit</text>
+<path d="M 178 198 L 637.8 198" fill="none" stroke="#2b3a4a" stroke-width="1.8"/>
+<path d="M 637.8 172 L 679.6 172" fill="none" stroke="#2b3a4a" stroke-width="1.8"/>
+<path d="M 679.6 198 L 721.4 198" fill="none" stroke="#2b3a4a" stroke-width="1.8"/>
+<path d="M 721.4 172 L 763.2 172" fill="none" stroke="#2b3a4a" stroke-width="1.8"/>
+<path d="M 763.2 198 L 846.8 198" fill="none" stroke="#2b3a4a" stroke-width="1.8"/>
+<path d="M 634.8 198 L 640.8 172" fill="none" stroke="#2b3a4a" stroke-width="1.8"/>
+<path d="M 676.6 172 L 682.6 198" fill="none" stroke="#2b3a4a" stroke-width="1.8"/>
+<path d="M 718.4 198 L 724.4 172" fill="none" stroke="#2b3a4a" stroke-width="1.8"/>
+<path d="M 760.2 172 L 766.2 198" fill="none" stroke="#2b3a4a" stroke-width="1.8"/>
+<text x="166" y="243" font-family="Helvetica,Arial,sans-serif" font-size="11.5" fill="#16202c" text-anchor="end">pool occupancy</text>
+<path d="M 183 226 L 214.8 226 L 219.8 239 L 214.8 252 L 183 252 L 178 239 Z" fill="#ffffff" stroke="#7a869a" stroke-width="1.5"/>
+<text x="198.9" y="243" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">0</text>
+<path d="M 224.8 226 L 256.6 226 L 261.6 239 L 256.6 252 L 224.8 252 L 219.8 239 Z" fill="#ffffff" stroke="#7a869a" stroke-width="1.5"/>
+<text x="240.7" y="243" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">1</text>
+<path d="M 266.6 226 L 298.4 226 L 303.4 239 L 298.4 252 L 266.6 252 L 261.6 239 Z" fill="#ffffff" stroke="#7a869a" stroke-width="1.5"/>
+<text x="282.5" y="243" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">2</text>
+<path d="M 308.4 226 L 423.8 226 L 428.8 239 L 423.8 252 L 308.4 252 L 303.4 239 Z" fill="#ffffff" stroke="#7a869a" stroke-width="1.5"/>
+<text x="366.1" y="243" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">3</text>
+<path d="M 433.8 226 L 465.6 226 L 470.6 239 L 465.6 252 L 433.8 252 L 428.8 239 Z" fill="#ffffff" stroke="#7a869a" stroke-width="1.5"/>
+<text x="449.7" y="243" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">63</text>
+<path d="M 475.6 226 L 632.8 226 L 637.8 239 L 632.8 252 L 475.6 252 L 470.6 239 Z" fill="#ffffff" stroke="#7a869a" stroke-width="1.5"/>
+<text x="554.2" y="243" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">64</text>
+<path d="M 642.8 226 L 674.6 226 L 679.6 239 L 674.6 252 L 642.8 252 L 637.8 239 Z" fill="#ffffff" stroke="#7a869a" stroke-width="1.5"/>
+<text x="658.7" y="243" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">63</text>
+<path d="M 684.6 226 L 841.8 226 L 846.8 239 L 841.8 252 L 684.6 252 L 679.6 239 Z" fill="#ffffff" stroke="#7a869a" stroke-width="1.5"/>
+<text x="763.2" y="243" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">64</text>
+<text x="512.4" y="288" font-family="Helvetica,Arial,sans-serif" font-size="10.5" fill="#6b7a8a" text-anchor="middle">credits exhausted - the host MUST stall</text>
+<text x="721.4" y="288" font-family="Helvetica,Arial,sans-serif" font-size="10.5" fill="#6b7a8a" text-anchor="middle">entry frees, credit returns, host resumes</text>
+<text x="14" y="292" font-family="Helvetica,Arial,sans-serif" font-size="11.5" fill="#5a6a7a">The host may assert req_valid only while it holds a credit. There is no ready signal on the request channel - holding a credit IS the permission to send.</text>
+</svg>

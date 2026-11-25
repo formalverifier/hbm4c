@@ -1,0 +1,91 @@
+{
+  "signal": [
+    {
+      "name": "clk",
+      "wave": "p................."
+    },
+    [
+      "request",
+      {
+        "name": "req_valid",
+        "wave": "0110....|........."
+      },
+      {
+        "name": "req_wr",
+        "wave": "x11x....|........."
+      },
+      {
+        "name": "req_blk[24:0]",
+        "wave": "x==x....|.........",
+        "data": [
+          "0x004A1",
+          "0x004A2"
+        ]
+      },
+      {
+        "name": "req_tag[7:0]",
+        "wave": "x==x....|.........",
+        "data": [
+          "11",
+          "12"
+        ]
+      },
+      {
+        "name": "req_be[31:0]",
+        "wave": "x==x....|.........",
+        "data": [
+          "all ones",
+          "all ones"
+        ]
+      }
+    ],
+    [
+      "write data  (lags by 2 beats here)",
+      {
+        "name": "wd_valid",
+        "wave": "0.0110..|........."
+      },
+      {
+        "name": "wd_ready",
+        "wave": "1.......|........."
+      },
+      {
+        "name": "wd_data[255:0]",
+        "wave": "x.x44x..|.........",
+        "data": [
+          "W0",
+          "W1"
+        ]
+      }
+    ],
+    [
+      "completion",
+      {
+        "name": "rsp_valid",
+        "wave": "0.......|.....110."
+      },
+      {
+        "name": "rsp_wack",
+        "wave": "0.......|.....110."
+      },
+      {
+        "name": "rsp_tag[7:0]",
+        "wave": "x.......|.....==x.",
+        "data": [
+          "11",
+          "12"
+        ]
+      }
+    ]
+  ],
+  "config": {
+    "hscale": 0.95
+  },
+  "head": {
+    "text": "Timing 3 - NHI write, with write-data skew",
+    "tick": 0
+  },
+  "foot": {
+    "text": "The write-data channel is separate and may lag the request by up to WD_SKEW (default 8) beats. Beats pair with requests in order - wd carries no tag."
+  }
+}

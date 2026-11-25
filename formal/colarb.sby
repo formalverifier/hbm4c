@@ -1,0 +1,26 @@
+# Safety (P-BUS-1) proves unbounded -- these are the properties that prevent
+# DRAM damage and discharge fv_timing_engine's assumption A2.
+#
+# The fairness bound P-LIVE-1 is DISABLED: it is not established at any
+# constant tried so far.  See OPEN-1 in ASSUMPTIONS.md.  Build with
+# -DFV_LIVENESS to reproduce.
+[tasks]
+prove
+cover
+
+[options]
+prove: mode prove
+prove: depth 20
+cover: mode cover
+cover: depth 20
+multiclock off
+
+[engines]
+smtbmc yices
+
+[script]
+read -formal colarb.v
+prep -top fv_col_arb
+
+[files]
+build/colarb.v

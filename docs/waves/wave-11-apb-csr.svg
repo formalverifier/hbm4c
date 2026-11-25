@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="824" height="416" viewBox="0 0 824 416">
+<defs>
+<pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="6" height="6" fill="#eef1f5"/><line x1="0" y1="0" x2="0" y2="6" stroke="#aab6c3" stroke-width="2"/></pattern>
+<marker id="wr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#b85450"/></marker>
+<marker id="wl" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#b85450"/></marker>
+</defs>
+<rect x="0" y="0" width="824" height="416" fill="#ffffff"/>
+<text x="14" y="24" font-family="Helvetica,Arial,sans-serif" font-size="15" font-weight="700" fill="#16202c">Timing 11 - APB4 CSR access</text>
+<path d="M 178 34 L 178 386" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="200" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">0</text>
+<path d="M 222 34 L 222 386" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="244" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">1</text>
+<path d="M 266 34 L 266 386" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="288" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">2</text>
+<path d="M 310 34 L 310 386" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="332" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">3</text>
+<path d="M 354 34 L 354 386" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="376" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">4</text>
+<path d="M 398 34 L 398 386" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="420" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">5</text>
+<path d="M 442 34 L 442 386" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="464" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">6</text>
+<path d="M 486 34 L 486 386" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="508" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">7</text>
+<path d="M 530 34 L 530 386" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="552" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">8</text>
+<path d="M 574 34 L 574 386" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="596" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">9</text>
+<path d="M 618 34 L 618 386" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="640" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">10</text>
+<path d="M 662 34 L 662 386" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="684" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">11</text>
+<path d="M 706 34 L 706 386" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="728" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">12</text>
+<path d="M 750 34 L 750 386" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="772" y="28" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#98a6b5" text-anchor="middle">13</text>
+<path d="M 794 34 L 794 386" stroke="#e3e8ee" stroke-width="1" fill="none"/>
+<text x="166" y="63" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11.5" fill="#16202c" text-anchor="end">pclk</text>
+<path d="M 178 72 L 178 46 L 200 46 L 200 72 L 222 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<path d="M 222 72 L 222 46 L 244 46 L 244 72 L 266 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<path d="M 266 72 L 266 46 L 288 46 L 288 72 L 310 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<path d="M 310 72 L 310 46 L 332 46 L 332 72 L 354 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<path d="M 354 72 L 354 46 L 376 46 L 376 72 L 398 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<path d="M 398 72 L 398 46 L 420 46 L 420 72 L 442 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<path d="M 442 72 L 442 46 L 464 46 L 464 72 L 486 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<path d="M 486 72 L 486 46 L 508 46 L 508 72 L 530 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<path d="M 530 72 L 530 46 L 552 46 L 552 72 L 574 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<path d="M 574 72 L 574 46 L 596 46 L 596 72 L 618 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<path d="M 618 72 L 618 46 L 640 46 L 640 72 L 662 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<path d="M 662 72 L 662 46 L 684 46 L 684 72 L 706 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<path d="M 706 72 L 706 46 L 728 46 L 728 72 L 750 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<path d="M 750 72 L 750 46 L 772 46 L 772 72 L 794 72" fill="none" stroke="#2b3a4a" stroke-width="1.6"/>
+<text x="166" y="105" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11.5" fill="#16202c" text-anchor="end">psel</text>
+<path d="M 178 114 L 222 114" fill="none" stroke="#2b3a4a" stroke-width="1.8"/>
+<path d="M 222 88 L 354 88" fill="none" stroke="#2b3a4a" stroke-width="1.8"/>
+<path d="M 354 114 L 442 114" fill="none" stroke="#2b3a4a" stroke-width="1.8"/>
+<path d="M 442 88 L 574 88" fill="none" stroke="#2b3a4a" stroke-width="1.8"/>
+<path d="M 574 114 L 794 114" fill="none" stroke="#2b3a4a" stroke-width="1.8"/>
+<path d="M 219 114 L 225 88" fill="none" stroke="#2b3a4a" stroke-width="1.8"/>
+<path d="M 351 88 L 357 114" fill="none" stroke="#2b3a4a" stroke-width="1.8"/>
+<path d="M 439 114 L 445 88" fill="none" stroke="#2b3a4a" stroke-width="1.8"/>
+<path d="M 571 88 L 577 114" fill="none" stroke="#2b3a4a" stroke-width="1.8"/>
+<text x="166" y="147" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11.5" fill="#16202c" text-anchor="end">penable</text>
+<path d="M 178 156 L 266 156" fill="none" stroke="#2b3a4a" stroke-width="1.8"/>
+<path d="M 266 130 L 354 130" fill="none" stroke="#2b3a4a" stroke-width="1.8"/>
+<path d="M 354 156 L 486 156" fill="none" stroke="#2b3a4a" stroke-width="1.8"/>
+<path d="M 486 130 L 574 130" fill="none" stroke="#2b3a4a" stroke-width="1.8"/>
+<path d="M 574 156 L 794 156" fill="none" stroke="#2b3a4a" stroke-width="1.8"/>
+<path d="M 263 156 L 269 130" fill="none" stroke="#2b3a4a" stroke-width="1.8"/>
+<path d="M 351 130 L 357 156" fill="none" stroke="#2b3a4a" stroke-width="1.8"/>
+<path d="M 483 156 L 489 130" fill="none" stroke="#2b3a4a" stroke-width="1.8"/>
+<path d="M 571 130 L 577 156" fill="none" stroke="#2b3a4a" stroke-width="1.8"/>
+<text x="166" y="189" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11.5" fill="#16202c" text-anchor="end">pwrite</text>
+<path d="M 178 198 L 222 198" fill="none" stroke="#2b3a4a" stroke-width="1.8"/>
+<path d="M 222 172 L 354 172" fill="none" stroke="#2b3a4a" stroke-width="1.8"/>
+<path d="M 354 198 L 794 198" fill="none" stroke="#2b3a4a" stroke-width="1.8"/>
+<path d="M 219 198 L 225 172" fill="none" stroke="#2b3a4a" stroke-width="1.8"/>
+<path d="M 351 172 L 357 198" fill="none" stroke="#2b3a4a" stroke-width="1.8"/>
+<text x="166" y="231" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11.5" fill="#16202c" text-anchor="end">paddr[15:0]</text>
+<rect x="178" y="214" width="44" height="26" fill="url(#hatch)" stroke="#2b3a4a" stroke-width="1.4"/>
+<path d="M 227 214 L 349 214 L 354 227 L 349 240 L 227 240 L 222 227 Z" fill="#ffffff" stroke="#7a869a" stroke-width="1.5"/>
+<text x="288" y="231" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">0x0500</text>
+<rect x="354" y="214" width="88" height="26" fill="url(#hatch)" stroke="#2b3a4a" stroke-width="1.4"/>
+<path d="M 447 214 L 569 214 L 574 227 L 569 240 L 447 240 L 442 227 Z" fill="#ffffff" stroke="#7a869a" stroke-width="1.5"/>
+<text x="508" y="231" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">0x2040</text>
+<rect x="574" y="214" width="220" height="26" fill="url(#hatch)" stroke="#2b3a4a" stroke-width="1.4"/>
+<text x="166" y="273" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11.5" fill="#16202c" text-anchor="end">pwdata[31:0]</text>
+<rect x="178" y="256" width="44" height="26" fill="url(#hatch)" stroke="#2b3a4a" stroke-width="1.4"/>
+<path d="M 227 256 L 349 256 L 354 269 L 349 282 L 227 282 L 222 269 Z" fill="#ffffff" stroke="#7a869a" stroke-width="1.5"/>
+<text x="288" y="273" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">0x0000_0060</text>
+<rect x="354" y="256" width="440" height="26" fill="url(#hatch)" stroke="#2b3a4a" stroke-width="1.4"/>
+<text x="166" y="315" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11.5" fill="#16202c" text-anchor="end">pready</text>
+<path d="M 178 324 L 310 324" fill="none" stroke="#2b3a4a" stroke-width="1.8"/>
+<path d="M 310 298 L 354 298" fill="none" stroke="#2b3a4a" stroke-width="1.8"/>
+<path d="M 354 324 L 530 324" fill="none" stroke="#2b3a4a" stroke-width="1.8"/>
+<path d="M 530 298 L 574 298" fill="none" stroke="#2b3a4a" stroke-width="1.8"/>
+<path d="M 574 324 L 794 324" fill="none" stroke="#2b3a4a" stroke-width="1.8"/>
+<path d="M 307 324 L 313 298" fill="none" stroke="#2b3a4a" stroke-width="1.8"/>
+<path d="M 351 298 L 357 324" fill="none" stroke="#2b3a4a" stroke-width="1.8"/>
+<path d="M 527 324 L 533 298" fill="none" stroke="#2b3a4a" stroke-width="1.8"/>
+<path d="M 571 298 L 577 324" fill="none" stroke="#2b3a4a" stroke-width="1.8"/>
+<text x="166" y="357" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11.5" fill="#16202c" text-anchor="end">prdata[31:0]</text>
+<rect x="178" y="340" width="352" height="26" fill="url(#hatch)" stroke="#2b3a4a" stroke-width="1.4"/>
+<path d="M 535 340 L 569 340 L 574 353 L 569 366 L 535 366 L 530 353 Z" fill="#ffffff" stroke="#7a869a" stroke-width="1.5"/>
+<text x="552" y="357" font-family="SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#16202c" text-anchor="middle">0x0000_1F40</text>
+<rect x="574" y="340" width="220" height="26" fill="url(#hatch)" stroke="#2b3a4a" stroke-width="1.4"/>
+<text x="288" y="402" font-family="Helvetica,Arial,sans-serif" font-size="10.5" fill="#6b7a8a" text-anchor="middle">write  WR_HI = 96</text>
+<text x="530" y="402" font-family="Helvetica,Arial,sans-serif" font-size="10.5" fill="#6b7a8a" text-anchor="middle">read  PC perf counter</text>
+<text x="14" y="406" font-family="Helvetica,Arial,sans-serif" font-size="11.5" fill="#5a6a7a">Standard APB4 on clk_cfg: SETUP then ACCESS, extended until pready. A write to a LOCKed register is dropped and raises an interrupt - see the programming guide.</text>
+</svg>

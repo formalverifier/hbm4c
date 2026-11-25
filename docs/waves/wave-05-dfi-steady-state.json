@@ -1,0 +1,93 @@
+{
+  "signal": [
+    {
+      "name": "clk",
+      "wave": "p..............."
+    },
+    [
+      "ROW command bus  -  independent (C3)",
+      {
+        "name": "dfi_row_cmd",
+        "wave": "=.4=..4=..4=..4=",
+        "data": [
+          "--",
+          "ACT b12",
+          "--",
+          "ACT b13",
+          "--",
+          "ACT b14",
+          "--",
+          "ACT b15",
+          "--"
+        ]
+      }
+    ],
+    [
+      "COLUMN command bus  -  one command per clock (C1)",
+      {
+        "name": "dfi_col_cmd",
+        "wave": "2345234523452345",
+        "data": [
+          "RD b0",
+          "RD b8",
+          "RD b16",
+          "RD b24",
+          "RD b1",
+          "RD b9",
+          "RD b17",
+          "RD b25",
+          "RD b2",
+          "RD b10",
+          "RD b18",
+          "RD b26",
+          "RD b3",
+          "RD b11",
+          "RD b19",
+          "RD b27"
+        ]
+      },
+      {
+        "name": "bank group",
+        "wave": "2345234523452345",
+        "data": [
+          "BG0",
+          "BG1",
+          "BG2",
+          "BG3",
+          "BG0",
+          "BG1",
+          "BG2",
+          "BG3",
+          "BG0",
+          "BG1",
+          "BG2",
+          "BG3",
+          "BG0",
+          "BG1",
+          "BG2",
+          "BG3"
+        ]
+      }
+    ],
+    [
+      "data bus",
+      {
+        "name": "DQ[31:0]",
+        "wave": "3...............",
+        "data": [
+          "32 B every clock   -   100% bus utilisation"
+        ]
+      }
+    ]
+  ],
+  "config": {
+    "hscale": 1.0
+  },
+  "head": {
+    "text": "Timing 5 - DFI steady state: all three constraints, visible at once",
+    "tick": 0
+  },
+  "foot": {
+    "text": "The picture worth memorising. C1: exactly one column command per clock. C2: the bank group changes every clock (see the colours). C3: the row bus issues ACTs in parallel, for free."
+  }
+}

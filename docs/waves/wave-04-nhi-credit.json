@@ -1,0 +1,55 @@
+{
+  "signal": [
+    {
+      "name": "clk",
+      "wave": "p..............."
+    },
+    {
+      "name": "req_valid",
+      "wave": "01111110...110.."
+    },
+    {
+      "name": "credits (host)",
+      "wave": "====..=6...=6...",
+      "data": [
+        "64",
+        "63",
+        "62",
+        "61",
+        "1",
+        "0",
+        "1",
+        "0"
+      ]
+    },
+    {
+      "name": "req_credit",
+      "wave": "0..........1010."
+    },
+    {},
+    {
+      "name": "pool occupancy",
+      "wave": "====..==...==...",
+      "data": [
+        "0",
+        "1",
+        "2",
+        "3",
+        "63",
+        "64",
+        "63",
+        "64"
+      ]
+    }
+  ],
+  "config": {
+    "hscale": 0.95
+  },
+  "head": {
+    "text": "Timing 4 - Credit flow control",
+    "tick": 0
+  },
+  "foot": {
+    "text": "The host may assert req_valid only while it holds a credit. There is no ready signal on the request channel - holding a credit IS the permission to send."
+  }
+}

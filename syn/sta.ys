@@ -1,0 +1,18 @@
+# Technology-mapped timing against ASAP7 (predictive 7nm, RVT, typical corner).
+#
+# NOT signoff timing: ASAP7 is a predictive academic library, there is no floorplan,
+# no wire load, no clock tree and no real parasitics. What it DOES give -- which the
+# earlier generic `abc -g simple` run could not -- is the critical path measured in
+# real cell delays instead of counts of 2-input gates.
+#
+# Wire delay is absent, which at 7nm is optimistic by a wide margin on a block this
+# size. Treat the number as a lower bound on the achievable period.
+read_verilog -sv build/slice.v
+hierarchy -top hbm4_pc_slice
+proc; opt; fsm; opt; memory; opt
+flatten; opt
+techmap; opt
+dfflibmap -liberty lib/asap7_rvt_tt_merged.lib
+abc -liberty lib/asap7_rvt_tt_merged.lib -script +strash;ifraig;scorr;dc2;dretime;strash;&get,-n;&dch,-f;&nf,{D};&put;buffer,-N,16;upsize;dnsize;stime
+opt_clean
+tee -o rpt/sta_stat.txt stat -liberty lib/asap7_rvt_tt_merged.lib

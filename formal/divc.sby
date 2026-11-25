@@ -1,0 +1,20 @@
+[tasks]
+prove
+bmc
+
+[options]
+prove: mode prove
+prove: depth 8
+bmc:   mode bmc
+bmc:   depth 12
+multiclock off
+
+[engines]
+smtbmc yices
+
+[script]
+read -formal divc.v
+prep -top fv_divc
+
+[files]
+build/divc.v

@@ -1,0 +1,28 @@
+# Generic synthesis for area and logic-depth evidence.
+#
+# No liberty file exists in an open-source flow, so this cannot produce signed
+# timing.  What it CAN produce is the number that decides whether 1 GHz is
+# plausible at all: the longest combinational path in LOGIC LEVELS.  At 1 GHz in
+# a modern node the budget is roughly 30-40 levels of simple gates.
+#
+# dfflegalize forces every flop to a plain $_DFF_P_ first.  Without it, flops
+# with clock enables ($_DFFE_PP_) are not recognised by `ltp -noff`, every enable
+# feedback Q->mux->D reads as a combinational cycle, and the report is a wall of
+# spurious "Detected loop" warnings.  `check -assert` (check.ys) is the
+# authoritative loop test and it passes.
+read_verilog -sv build/slice.v
+hierarchy -top hbm4_pc_slice
+proc; opt; fsm; opt; memory; opt
+# FLATTEN before any path analysis.  Unflattened, ltp treats each submodule
+# instance as a black box in which every input reaches every output, so any two
+# blocks that feed one another read as a combinational cycle even when the real
+# path between them is registered.  That is where 185 spurious "Detected loop"
+# warnings came from -- not from the design.  check.ys is the authoritative
+# loop test and it passes.
+flatten; opt
+techmap; opt
+dfflegalize -cell $_DFF_P_ x
+abc -g simple
+opt_clean
+tee -o rpt/stat.txt stat
+tee -o rpt/ltp.txt ltp -noff

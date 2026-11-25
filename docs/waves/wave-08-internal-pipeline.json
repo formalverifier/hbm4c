@@ -1,0 +1,96 @@
+{
+  "signal": [
+    {
+      "name": "clk",
+      "wave": "p..........."
+    },
+    [
+      "E0  accept",
+      {
+        "name": "nhi_req_valid",
+        "wave": "010........."
+      },
+      {
+        "name": "pool_alloc",
+        "wave": "0.10........"
+      }
+    ],
+    [
+      "E1  decode and file",
+      {
+        "name": "e1_valid",
+        "wave": "0..10......."
+      },
+      {
+        "name": "e1_row / e1_col",
+        "wave": "x..=x.......",
+        "data": [
+          "row 0x1A4, col 7"
+        ]
+      },
+      {
+        "name": "e1_bank",
+        "wave": "x..=x.......",
+        "data": [
+          "b12  (BG1)"
+        ]
+      },
+      {
+        "name": "hazard_hit",
+        "wave": "0..........."
+      }
+    ],
+    [
+      "S0  ready vectors, for cycle N+1",
+      {
+        "name": "col_ready[31:0]",
+        "wave": "=...=.......",
+        "data": [
+          "...",
+          "b12 ready"
+        ]
+      },
+      {
+        "name": "row_ready[31:0]",
+        "wave": "=...=.......",
+        "data": [
+          "...",
+          "b12 open"
+        ]
+      }
+    ],
+    [
+      "S1  arbitrate    |    S2  format and drive",
+      {
+        "name": "col_grant",
+        "wave": "0....10....."
+      },
+      {
+        "name": "dfi_col_cmd",
+        "wave": "=.....2=....",
+        "data": [
+          "--",
+          "RD b12",
+          "--"
+        ]
+      },
+      {
+        "name": "dfi_col_phase",
+        "wave": "x.....=x....",
+        "data": [
+          "1"
+        ]
+      }
+    ]
+  ],
+  "config": {
+    "hscale": 1.0
+  },
+  "head": {
+    "text": "Timing 8 - One request through the controller pipeline",
+    "tick": 0
+  },
+  "foot": {
+    "text": "The internal view of Figure 6. S0 computes ready vectors for the cycle AFTER it runs; that one-cycle speculation is what keeps S1 a pure mux at 1 GHz."
+  }
+}

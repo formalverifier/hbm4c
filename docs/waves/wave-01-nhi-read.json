@@ -1,0 +1,91 @@
+{
+  "signal": [
+    {
+      "name": "clk",
+      "wave": "p..................."
+    },
+    [
+      "request  (host -> controller)",
+      {
+        "name": "req_valid",
+        "wave": "010....|............",
+        "node": ".a.................."
+      },
+      {
+        "name": "req_wr",
+        "wave": "x0x....|............"
+      },
+      {
+        "name": "req_blk[24:0]",
+        "wave": "x=x....|............",
+        "data": [
+          "0x004A1"
+        ]
+      },
+      {
+        "name": "req_tag[7:0]",
+        "wave": "x=x....|............",
+        "data": [
+          "07"
+        ]
+      },
+      {
+        "name": "req_qos[1:0]",
+        "wave": "x=x....|............",
+        "data": [
+          "1"
+        ]
+      },
+      {
+        "name": "req_credit",
+        "wave": "0......|..........10"
+      }
+    ],
+    [
+      "response  (controller -> host)",
+      {
+        "name": "rsp_valid",
+        "wave": "0......|.........10.",
+        "node": ".................b.."
+      },
+      {
+        "name": "rsp_ready",
+        "wave": "1......|............"
+      },
+      {
+        "name": "rsp_tag[7:0]",
+        "wave": "x......|.........=x.",
+        "data": [
+          "07"
+        ]
+      },
+      {
+        "name": "rsp_data[255:0]",
+        "wave": "x......|.........3x.",
+        "data": [
+          "32 B read data"
+        ]
+      },
+      {
+        "name": "rsp_err[1:0]",
+        "wave": "x......|.........=x.",
+        "data": [
+          "ok"
+        ]
+      }
+    ]
+  ],
+  "config": {
+    "hscale": 0.95
+  },
+  "edge": [
+    "a<->b  ~32 clk idle, row hit"
+  ],
+  "head": {
+    "text": "Timing 1 - NHI read transaction",
+    "tick": 0
+  },
+  "foot": {
+    "text": "One 32-byte read. The controller echoes req_tag back as rsp_tag, so the host never has to track ordering. The red break is DRAM latency, not a stall."
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "signal": [
+    {
+      "name": "clk",
+      "wave": "p..................."
+    },
+    {
+      "name": "req_valid",
+      "wave": "01110..|............"
+    },
+    {
+      "name": "req_tag[7:0]",
+      "wave": "x===x..|............",
+      "data": [
+        "07",
+        "08",
+        "09"
+      ]
+    },
+    {
+      "name": "row hit?",
+      "wave": "x===x..|............",
+      "data": [
+        "miss",
+        "HIT",
+        "miss"
+      ]
+    },
+    {},
+    {
+      "name": "rsp_valid",
+      "wave": "0.......|.....1110.."
+    },
+    {
+      "name": "rsp_tag[7:0]",
+      "wave": "x.......|.....===x..",
+      "data": [
+        "08",
+        "07",
+        "09"
+      ]
+    },
+    {
+      "name": "rsp_data[255:0]",
+      "wave": "x.......|.....333x..",
+      "data": [
+        "D08",
+        "D07",
+        "D09"
+      ]
+    }
+  ],
+  "config": {
+    "hscale": 0.95
+  },
+  "head": {
+    "text": "Timing 2 - Responses return out of order",
+    "tick": 0
+  },
+  "foot": {
+    "text": "Tags 07, 08, 09 are issued in that order. Tag 08 hit an open row, so it comes back first. The host must key on the tag, never on arrival order."
+  }
+}

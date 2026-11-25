@@ -1,0 +1,55 @@
+{
+  "signal": [
+    {
+      "name": "clk",
+      "wave": "p..............."
+    },
+    {
+      "name": "dfi_col_cmd",
+      "wave": "4222222222222224",
+      "data": [
+        "RD col30 (ECC)",
+        "RD c0",
+        "RD c1",
+        "RD c2",
+        "RD c3",
+        "RD c4",
+        "RD c5",
+        "RD c6",
+        "RD c7",
+        "RD c8",
+        "RD c9",
+        "RD c10",
+        "RD c11",
+        "RD c12",
+        "RD c13",
+        "RD col31 (ECC)"
+      ]
+    },
+    {
+      "name": "bank / row",
+      "wave": "=...............",
+      "data": [
+        "b12, row 0x1A4   -   unchanged throughout"
+      ]
+    },
+    {
+      "name": "ecc_cache_hit",
+      "wave": "01.............0"
+    },
+    {
+      "name": "ecc_fill_pending",
+      "wave": "10.............."
+    }
+  ],
+  "config": {
+    "hscale": 1.0
+  },
+  "head": {
+    "text": "Timing 9 - Inline ECC costs one column access in fifteen",
+    "tick": 0
+  },
+  "foot": {
+    "text": "The ECC column lives in the SAME open row, so fetching it is an ordinary column read - no activate, no precharge, no bank conflict. After the fill, 14 more accesses hit the cached block."
+  }
+}

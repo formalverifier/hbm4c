@@ -1,0 +1,24 @@
+# The pool has by far the largest state of any block proved so far: NLST lists
+# x {head, tail, count} plus a head mirror per list.  Unbounded proof does not
+# close in reasonable time at 8 banks; reported as BMC-bounded, never as proved.
+# See ASSUMPTIONS.md OPEN-4.
+[tasks]
+bmc
+cover
+
+[options]
+bmc:   mode bmc
+bmc:   depth 6
+cover: mode cover
+cover: depth 12
+multiclock off
+
+[engines]
+smtbmc yices
+
+[script]
+read -formal pool.v
+prep -top fv_txn_pool
+
+[files]
+build/pool.v
