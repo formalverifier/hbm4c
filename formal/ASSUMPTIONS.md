@@ -1,6 +1,9 @@
 # Formal Assumption Audit
 
-**Rev 1.0** · reviewed at each signoff (verification plan criterion S4)
+**Rev 1.4** · reviewed at each signoff (verification plan criterion S4). Rev 1.4 updated the
+status lines, added OPEN-13 to OPEN-18, and lists A8–A10 for the first time: `fv_nhi_target`
+has always assumed them, and this audit never recorded them. **A10 is violated by the design**
+(OPEN-16).
 
 Every `assume` is a hole in a proof. A proof over an environment that cannot happen proves
 nothing, so each one is listed here with a justification and the place it is discharged.
@@ -43,8 +46,9 @@ two real defects a policing checker could not have: the boot script had no `PREC
 (so the controller and device disagreed about open rows after a reset), and the DFI command
 strobes had no reset term.
 
-**Residual:** one slice at a time. Reset behaviour of the assembled 256-slice system is
-untested, as is everything else at that level.
+**Residual:** one slice at a time. Reset at the stack and system level is untested. The system
+top is simulated only at reduced geometry (2 stacks, 8 slices), and only for boot and control;
+the 256-slice production system has never been simulated.
 
 ---
 
@@ -145,6 +149,45 @@ so A7 does not rest on the two modules agreeing about a shared signal. `fv_row_a
 `p_act_legal` closes the loop by proving the arbiter only issues cleared ACTs.
 **Status: DISCHARGED.**
 
+## A8 — The host obeys its credits
+
+**Where:** `fv_nhi_target`
+
+```systemverilog
+if (req_valid) assume (outstanding < TQ_DEPTH);
+```
+
+Host rule H1 ([docs/03 §1.6](../docs/03-interface-spec.md)). The controller has no `ready` to
+withhold, so it cannot enforce this. **Status: a host obligation, not discharged.** The comment
+in `fv_nhi_target` says the verification kit ships an NHI protocol assertion for the integrator
+to bind into their fabric. None exists in the repository. The simulation drivers obey credits,
+which is consistent with the assumption but checks nothing about a real host.
+
+## A9 — The core completes only what it was given
+
+**Where:** `fv_nhi_target`
+
+```systemverilog
+if (cmpl_valid) assume (n_cmpl < n_accepted);
+```
+
+**Status: holds in every simulation, not proved.** No proof covers `hbm4_pc_slice` (OPEN-14).
+The slice completes each request at most once. It can complete fewer (OPEN-13, OPEN-16,
+OPEN-17), which this assumption does not exclude.
+
+## A10 — The core never offers a completion the NHI cannot take
+
+**Where:** `fv_nhi_target` (unnamed before Rev 1.4)
+
+```systemverilog
+if (cmpl_valid) assume (cmpl_ready);
+```
+
+**Status: VIOLATED by `hbm4_pc_slice` (OPEN-16).** The slice drives `cmpl_valid` for read returns
+and for write issues without looking at `cmpl_ready`. So P-NHI-1's credit conservation holds
+only while the host never deasserts `rsp_ready`. This is the rule at the top of this file: an
+assumption that is only ever assumed is a wish, and this one the design contradicts.
+
 ---
 
 ## Open items
@@ -163,17 +206,110 @@ the `last_bg` register, and dropped one priority encoder from the critical path.
 Trying to *prove* a claimed property is what exposed the redundancy. The original text of
 this item is kept below because the reasoning is the point.
 
-<details><summary>Original OPEN-1 (Rev 0.4)</summary>
+### OPEN-18 — The `SYSECC_EN = 0` decode path is misaligned
+
+In `hbm4_addr_decode`'s `g_pow2_split` branch (`SYSECC_EN = 0`), valid passes through two
+registers but the remainder through only one. Row and column therefore belong to the following
+request, while bank and valid belong to the current one, so every access would go to the wrong
+row or column of the right bank. The comment there says the opposite. `hbm4_pkg` sets
+`SYSECC_EN = 1`, and every proof, simulation and synthesis run uses that, so this path has never
+been built. Found in the Rev 1.4 review; pre-existing. **To close:** add a second remainder
+stage, and exercise `SYSECC_EN = 0` in the addrmap miter or a slice simulation. Or declare
+`SYSECC_EN = 0` unsupported.
+
+### OPEN-17 — Write acknowledgements are lost under mixed traffic
+
+A write that issues in the same cycle as a read completion has its acknowledgement deferred
+into a single register (`wack_pending` / `wack_tag` in `hbm4_pc_slice`). A second write issued
+while that register is full loses an ack either way. If no read is returning, the mux presents
+the deferred ack, and the new write's completion is neither presented nor saved. If a read is
+returning, `wack_tag` is overwritten. **Each lost ack leaks a credit**, so a port under sustained
+mixed traffic eventually runs out of credits.
+
+Confirmed by a Rev 1.4 simulation probe with `rsp_ready` held high: 400 random requests at
+production geometry got **199 of 213** write acknowledgements, while all 187 reads were answered.
+Reduced geometry got all of them. `test_random_traffic` checks timing and error flags, not that
+every request is answered. Pre-existing. **To close:** a FIFO of pending write acks (`TQ_DEPTH`
+deep is always enough), or hold write issue while one is pending. Add a test that every request
+gets exactly one response.
+
+### OPEN-16 — `rsp_ready` back-pressure loses completions
+
+`hbm4_nhi_target` accepts a completion only when `cmpl_ready = !skid_v || rsp_ready`.
+`hbm4_pc_slice` presents read returns and write completions without consulting `cmpl_ready`, and
+nothing stalls column issue or buffers a returning read. So whenever the skid buffer holds a
+response and the host holds `rsp_ready` low, every completion produced meanwhile is dropped:
+the response never arrives, the tag never answers, the credit never returns. Rule H4, and
+[docs/02 §6.2](../docs/02-architecture.md), say back-pressure propagates to the DRAM bus. It
+does not. This also violates A10.
+
+Confirmed by a Rev 1.4 probe: a 300-cycle `rsp_ready` stall during a burst of reads left
+**2 of 4** responses accepted at reduced geometry and **17 of 64** at production geometry, with the
+rest lost. Every test holds `rsp_ready` high. Pre-existing. **To close:** real back-pressure
+(stop issuing column commands while completions cannot drain, with a return buffer sized for
+the reads already in flight), and a test that toggles `rsp_ready`.
+
+### OPEN-15 — A second queued write to the same block loses RAW protection
+
+`hbm4_wbuf` coalesces a write that hits an existing hazard entry: it ORs the byte enables in
+and creates no new entry. Every write issue drains the entry it hits. So with `W1(X)` and
+`W2(X)` both queued, W1's issue clears the shared entry while W2 is still in the pool, and a read
+of X can then issue before W2 and return W1's data. **Silent stale data, the RAW failure Rev 1.2
+fixed for the single-write case.**
+
+Confirmed by a Rev 1.4 simulation probe at both geometries: `W1(X), W2(X), R(X)` produced the
+column-command order **W, R, W**. `test_raw_hazard` sends one write per block and cannot see it.
+Pre-existing since the write buffer was wired in (Rev 1.2). **To close:** one hazard entry per
+write (`WBUF_DEPTH ≥ TQ_DEPTH` already guarantees room), or a per-entry count of merged writes
+cleared only when the last one drains. Add a `W, W, R` test.
+
+### OPEN-14 — Seven modules are covered by no proof, and their assertions by nothing
+
+No proof reads `hbm4_dir_fsm`, `hbm4_dfi_adapter`, `hbm4_seq_rom`, `hbm4_supervisor`,
+`hbm4_pc_slice`, `hbm4_stack_top` or `hbm4_sys_top`. Simulation covers all seven, at slice,
+stack and system level, but nothing proves them.
+
+Two assertions are written inside them anyway: `a_burst_bounded` in `hbm4_dir_fsm` and
+`a_pool_has_room` in `hbm4_pc_slice`. Both sit in `` `ifdef FORMAL `` blocks that no proof
+compiles, and the simulation build does not enable them either, **so they are checked by
+nothing.** They read as verified and are not. P-DIR-1 and P-DIR-2 in the verification plan
+are also unimplemented.
+
+Rev 1.4 does not rely on `a_pool_has_room`: the write-data store is gated by
+`pool_alloc_ready` in the RTL itself.
+
+**To close:** a `dir_fsm` proof (P-DIR-*, `a_burst_bounded`), and either a slice-level proof or
+running the embedded assertions in simulation (Verilator `--assert`).
+
+### OPEN-13 — Out-of-range requests are dropped without a response
+
+A request whose block address decodes beyond capacity (`dec_oor` in `hbm4_pc_slice`) is not
+allocated and never completed. The NHI counted it as outstanding on acceptance, so **its credit
+never returns and its tag never answers.** After `TQ_DEPTH` such requests a port has no
+credits left. [docs/03](../docs/03-interface-spec.md) defines `rsp_err = 3` ("access fault")
+for this case, and nothing generates it.
+
+Confirmed by a simulation probe in Rev 1.4: one out-of-range read at reduced geometry got no
+response in 3000 cycles, the host was left with 3 of 4 credits, and the NHI's outstanding count
+stuck at 1.
+
+It is reachable only through a host addressing error, but the consequence is a hang rather
+than an error. No proof covers it. `fv_nhi_target` proves the credit accounting of the NHI alone, which is
+correct under A8–A10, but A10 does not hold (OPEN-16), and the leak is in the slice
+(OPEN-14). **To close:** complete
+out-of-range requests with `rsp_err = 3`, and add a slice test.
 
 ### OPEN-12 — Write-data integrity is bounded, not proved
 
-`fv_wdata_ram` proves three properties unbounded — the written-flag mirrors the shadow, a write
-issued with no data is reported, and no false alarm is raised. Those depend only on the
-written-vector, which the DUT exports as `dbg_written`.
+Three of `fv_wdata_ram`'s properties are inductive — the written-flag mirrors the shadow, a
+write issued with no data is reported, and no false alarm is raised — because they depend only
+on the written-vector, which the DUT exports as `dbg_written`. **But `wdataram.sby` runs only
+`bmc` and `cover` tasks, so all four are bounded at depth 16 as shipped.** Adding a `prove`
+task for the three would close them.
 
 **`p_data_integrity` is BMC-only.** It needs *"for every entry, the array holds what was written
 there"*, and the array is observable only through the addressed read port. Stating it for the
-read tag alone leaves the induction step free to begin from a state where some other entry
+read index alone leaves the induction step free to begin from a state where some other entry
 already disagrees — which is exactly the shape that defeated OPEN-6 on the read FIFO.
 
 Two things were tried before settling: a single symbolic entry (fails, same reason as OPEN-6),
@@ -183,8 +319,14 @@ genuine improvement — but the shadow still cannot be compared against an unobs
 Closing it would need a `TQ_DEPTH:1` mux of 256 bits exported for observation. **That is real
 silicon area for a proof, on a block this small, and it was judged not worth it** — the same
 call as the reverted debug port in OPEN-6, made deliberately this time rather than after the
-fact. BMC to depth 16 covers write, read-back, tag reuse and the no-data path several times
+fact. BMC to depth 16 covers write, read-back, entry reuse and the no-data path several times
 over at `TQ_DEPTH = 4`.
+
+**Since Rev 1.4 the RAM is indexed by transaction-pool entry, not by tag.** The block proof is
+unchanged in substance. It also could not have caught the Rev 1.3 bug: that was in how the
+slice chose the index (a truncated 8-bit tag into 64 entries, and tags H2 allows to repeat), and
+that choice lies outside the block. The pool's exported indices are now tied to its entries
+by `a_alloc_idx_free` and `a_issue_idx_*`, inside the pool proof.
 
 Matching mutations exist for all four properties.
 
@@ -246,6 +388,8 @@ a sustained read stream that keeps occupancy below `wr_hi` starves queued writes
 
 **Do not close this by widening a constant.** The number is not the problem; the missing
 mechanism is.
+
+<details><summary>Original OPEN-1 (Rev 0.4)</summary>
 
 ### OPEN-1 — The column arbiter fairness bound is not established
 
@@ -449,6 +593,8 @@ retry), but correct and visible.
 argues for treating an unconnected output as an error rather than a style warning. Closing it
 means adding a replay path in the pool, and the docs' availability claim should be softened
 until then.
+
+</details>
 
 ### OPEN-7 — Inline system ECC is SEC-DED, not symbol-correcting
 

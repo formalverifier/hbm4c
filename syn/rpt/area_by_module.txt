@@ -1,19 +1,54 @@
 
 13. Printing statistics.
 
+=== hbm4_pc_slice ===
+
+        +----------Local Count, excluding submodules.
+        | 
+     6595 wires
+    18461 wire bits
+      194 public wires
+    12060 public wire bits
+       51 ports
+     1710 port bits
+     7955 cells
+     2498   $_AND_
+      264   $_DFFE_PP_
+      278   $_DFF_P_
+      512   $_MUX_
+     1458   $_NOT_
+     2428   $_OR_
+        1   $_SDFFE_PN0P_
+      516   $_XOR_
+       13 submodules
+        1   $paramod\hbm4_dfi_adapter\RD_FIFO_DEPTH=32'00000000000000000000000000100000
+        1   $paramod\hbm4_link_ecc\RETRY_MAX=s32'00000000000000000000000000000011
+        1   hbm4_addr_decode
+        1   hbm4_bank_state
+        1   hbm4_col_arb
+        1   hbm4_dir_fsm
+        1   hbm4_nhi_target
+        1   hbm4_refresh
+        1   hbm4_row_arb
+        1   hbm4_timing_engine
+        1   hbm4_txn_pool
+        1   hbm4_wbuf
+        1   hbm4_wdata_ram
+
 === $paramod\hbm4_dfi_adapter\RD_FIFO_DEPTH=32'00000000000000000000000000100000 ===
 
         +----------Local Count, excluding submodules.
         | 
-       31 wires
-      710 wire bits
-       29 public wires
-      708 public wire bits
-       22 ports
-      655 port bits
-       40 cells
-       38   $_AND_
-        2   $_NOT_
+       37 wires
+     1226 wire bits
+       32 public wires
+     1221 public wire bits
+       25 ports
+     1168 port bits
+       46 cells
+       42   $_AND_
+        3   $_NOT_
+        1   $_XOR_
         1 submodules
         1   $paramod$5b88013caa1445791f09fc5f38186109d5e34819\hbm4_rd_ptr_fifo
 
@@ -77,39 +112,39 @@
 
         +----------Local Count, excluding submodules.
         | 
-    26921 wires
-    33846 wire bits
-      678 public wires
-     7503 public wire bits
-       21 ports
-     1155 port bits
-    32637 cells
-    12855   $_AND_
+    26632 wires
+    33572 wire bits
+      681 public wires
+     7521 public wire bits
+       23 ports
+     1167 port bits
+    32351 cells
+    12709   $_AND_
      5696   $_DFFE_PP_
-     3142   $_MUX_
-      305   $_NOT_
-     9144   $_OR_
+     3229   $_MUX_
+      244   $_NOT_
+     8992   $_OR_
       384   $_SDFFE_PN0P_
        64   $_SDFF_PN0_
-     1047   $_XOR_
+     1033   $_XOR_
 
 === hbm4_timing_engine ===
 
         +----------Local Count, excluding submodules.
         | 
-    19856 wires
-    33038 wire bits
+    19803 wires
+    32985 wire bits
      1519 public wires
     14701 public wire bits
        10 ports
       426 port bits
-    20785 cells
-     6207   $_AND_
-     1953   $_MUX_
-     2832   $_NOT_
-     6276   $_OR_
+    20732 cells
+     6159   $_AND_
+     1990   $_MUX_
+     2808   $_NOT_
+     6252   $_OR_
      1288   $_SDFF_PN0_
-     2229   $_XOR_
+     2235   $_XOR_
 
 === $paramod$9b9963c6760a33121ecb680370f84f5139893849\hbm4_hash ===
 
@@ -129,19 +164,19 @@
 
         +----------Local Count, excluding submodules.
         | 
-     3260 wires
-     4087 wire bits
+     3453 wires
+     4280 wire bits
        30 public wires
       857 public wire bits
        15 ports
       649 port bits
-     3325 cells
-      723   $_AND_
-     1832   $_MUX_
-       91   $_NOT_
-      657   $_OR_
+     3518 cells
+      915   $_AND_
+     1670   $_MUX_
+       88   $_NOT_
+      822   $_OR_
         5   $_SDFFE_PN0P_
-       17   $_XOR_
+       18   $_XOR_
         2 submodules
         2   $paramod\hbm4_rr_arb\N=32'00000000000000000000000000100000
 
@@ -149,38 +184,38 @@
 
         +----------Local Count, excluding submodules.
         | 
-     7781 wires
-     9129 wire bits
+     7786 wires
+     9134 wire bits
        97 public wires
      1430 public wire bits
        22 ports
       656 port bits
-     8374 cells
-     3280   $_AND_
+     8379 cells
+     3281   $_AND_
        16   $_DFF_P_
-      273   $_MUX_
-      772   $_NOT_
-     2512   $_OR_
+      253   $_MUX_
+      783   $_NOT_
+     2530   $_OR_
       331   $_SDFFE_PN0P_
       256   $_SDFFE_PP0P_
-      934   $_XOR_
+      929   $_XOR_
 
 === hbm4_dir_fsm ===
 
         +----------Local Count, excluding submodules.
         | 
-      705 wires
-      905 wire bits
+      726 wires
+      926 wire bits
        21 public wires
       221 public wire bits
        18 ports
       202 port bits
-      703 cells
-      248   $_AND_
-      122   $_NOT_
-      282   $_OR_
+      724 cells
+      254   $_AND_
+      126   $_NOT_
+      294   $_OR_
        18   $_SDFFE_PN0P_
-       33   $_XOR_
+       32   $_XOR_
 
 === hbm4_col_arb ===
 
@@ -221,21 +256,43 @@
        96   $_SDFF_PN0_
         1   $_XOR_
 
-=== hbm4_sys_ecc ===
+=== hbm4_wdata_ram ===
 
         +----------Local Count, excluding submodules.
         | 
-     2511 wires
-     3938 wire bits
-       18 public wires
-     1445 public wire bits
-        9 ports
-      806 port bits
-     2761 cells
-      349   $_AND_
-       27   $_NOT_
-        5   $_OR_
-     2380   $_XOR_
+    31785 wires
+    49069 wire bits
+       75 public wires
+    17041 public wire bits
+       10 ports
+      593 port bits
+    48733 cells
+    14402   $_AND_
+    16384   $_DFFE_PP_
+     6524   $_MUX_
+       46   $_NOT_
+    11301   $_OR_
+       64   $_SDFF_PN0_
+       12   $_XOR_
+
+=== hbm4_wbuf ===
+
+        +----------Local Count, excluding submodules.
+        | 
+    58378 wires
+    72644 wire bits
+      431 public wires
+    14535 public wire bits
+       23 ports
+     5105 port bits
+    67216 cells
+    23777   $_AND_
+     8832   $_DFFE_PP_
+     4844   $_MUX_
+     6036   $_NOT_
+    20477   $_OR_
+      128   $_SDFF_PN0_
+     3122   $_XOR_
 
 === hbm4_nhi_target ===
 
@@ -257,19 +314,21 @@
        16   $_SDFF_PN0_
        18   $_XOR_
 
-=== $paramod$da2c1f6dd6c44cca88538fb914bd62fedf221f54\hbm4_hash ===
+=== hbm4_sys_ecc ===
 
         +----------Local Count, excluding submodules.
         | 
-      151 wires
-      253 wire bits
-        4 public wires
-      106 public wire bits
-        4 ports
-      106 port bits
-      150 cells
-       75   $_AND_
-       75   $_XOR_
+     2511 wires
+     3938 wire bits
+       18 public wires
+     1445 public wire bits
+        9 ports
+      806 port bits
+     2761 cells
+      349   $_AND_
+       27   $_NOT_
+        5   $_OR_
+     2380   $_XOR_
 
 === hbm4_addr_decode ===
 
@@ -287,6 +346,20 @@
         1   $paramod$9b9963c6760a33121ecb680370f84f5139893849\hbm4_hash
         1   $paramod$da2c1f6dd6c44cca88538fb914bd62fedf221f54\hbm4_hash
         1   $paramod$f47dc8c8509e4939f80c6b05859ca5081a289b4a\hbm4_divc
+
+=== $paramod$da2c1f6dd6c44cca88538fb914bd62fedf221f54\hbm4_hash ===
+
+        +----------Local Count, excluding submodules.
+        | 
+      151 wires
+      253 wire bits
+        4 public wires
+      106 public wire bits
+        4 ports
+      106 port bits
+      150 cells
+       75   $_AND_
+       75   $_XOR_
 
 === $paramod$f47dc8c8509e4939f80c6b05859ca5081a289b4a\hbm4_divc ===
 
@@ -307,44 +380,12 @@
         2   $_SDFF_PN0_
       218   $_XOR_
 
-=== hbm4_pc_slice ===
-
-        +----------Local Count, excluding submodules.
-        | 
-     6499 wires
-    12016 wire bits
-      173 public wires
-     5690 public wire bits
-       48 ports
-     1197 port bits
-     7366 cells
-     2417   $_AND_
-        8   $_DFFE_PP_
-       22   $_DFF_P_
-      512   $_MUX_
-     1448   $_NOT_
-     2412   $_OR_
-        1   $_SDFFE_PN0P_
-      546   $_XOR_
-       11 submodules
-        1   $paramod\hbm4_dfi_adapter\RD_FIFO_DEPTH=32'00000000000000000000000000100000
-        1   $paramod\hbm4_link_ecc\RETRY_MAX=s32'00000000000000000000000000000011
-        1   hbm4_addr_decode
-        1   hbm4_bank_state
-        1   hbm4_col_arb
-        1   hbm4_dir_fsm
-        1   hbm4_nhi_target
-        1   hbm4_refresh
-        1   hbm4_row_arb
-        1   hbm4_timing_engine
-        1   hbm4_txn_pool
-
 === design hierarchy ===
 
         +----------Count including submodules.
         | 
-    81695 hbm4_pc_slice
-       40 $paramod\hbm4_dfi_adapter\RD_FIFO_DEPTH=32'00000000000000000000000000100000
+   198119 hbm4_pc_slice
+       46 $paramod\hbm4_dfi_adapter\RD_FIFO_DEPTH=32'00000000000000000000000000100000
       962   $paramod$5b88013caa1445791f09fc5f38186109d5e34819\hbm4_rd_ptr_fifo
       212 $paramod\hbm4_link_ecc\RETRY_MAX=s32'00000000000000000000000000000011
      2761   hbm4_sys_ecc
@@ -355,37 +396,39 @@
      1222 hbm4_bank_state
       352 hbm4_col_arb
       558   $paramod\hbm4_rr_arb\N=32'00000000000000000000000000100000
-      703 hbm4_dir_fsm
+      724 hbm4_dir_fsm
       396 hbm4_nhi_target
-     8374 hbm4_refresh
-     3325 hbm4_row_arb
+     8379 hbm4_refresh
+     3518 hbm4_row_arb
       558   $paramod\hbm4_rr_arb\N=32'00000000000000000000000000100000
-    20785 hbm4_timing_engine
-    32637 hbm4_txn_pool
+    20732 hbm4_timing_engine
+    32351 hbm4_txn_pool
+    67216 hbm4_wbuf
+    48733 hbm4_wdata_ram
 
         +----------Count including submodules.
         | 
-    72050 wires
-   107161 wire bits
-     2843 public wires
-    37653 public wire bits
-      278 ports
-     8490 port bits
+   162192 wires
+   235727 wire bits
+     3376 public wires
+    76130 public wire bits
+      319 ports
+    15226 port bits
         - memories
         - memory bits
         - processes
-    81695 cells
-    27795   $_AND_
-     6269   $_DFFE_PP_
-       38   $_DFF_P_
-     8730   $_MUX_
-     5902   $_NOT_
-    22341   $_OR_
+   198119 cells
+    66064   $_AND_
+    31741   $_DFFE_PP_
+      294   $_DFF_P_
+    20040   $_MUX_
+    11922   $_NOT_
+    54154   $_OR_
      1282   $_SDFFE_PN0P_
       256   $_SDFFE_PP0P_
-     1481   $_SDFF_PN0_
-     7601   $_XOR_
-       11 submodules
+     1673   $_SDFF_PN0_
+    10693   $_XOR_
+       13 submodules
         1   $paramod\hbm4_dfi_adapter\RD_FIFO_DEPTH=32'00000000000000000000000000100000
         1   $paramod\hbm4_link_ecc\RETRY_MAX=s32'00000000000000000000000000000011
         1   hbm4_addr_decode
@@ -397,4 +440,6 @@
         1   hbm4_row_arb
         1   hbm4_timing_engine
         1   hbm4_txn_pool
+        1   hbm4_wbuf
+        1   hbm4_wdata_ram
 

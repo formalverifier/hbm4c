@@ -1,6 +1,6 @@
 # A — Glossary
 
-**HBM4 Memory Controller · Rev 1.3**
+**HBM4 Memory Controller · Rev 1.4**
 
 Every acronym and term used in this documentation set. Written for someone new to DRAM
 controllers; nothing here assumes you have seen the rest of the docs.
@@ -27,7 +27,9 @@ pseudo-channel = 32 bytes.
 equivalent.
 
 **Column** — The addressable unit within an open row. 32 columns of 32 B per 1 KB row here;
-30 are data and 2 hold ECC when inline ECC is on.
+30 are data and 2 hold ECC when inline ECC is on. (Rev 1.4: the 2 columns are still reserved,
+but inline ECC is not integrated and nothing reads or writes them; see
+[09 Release Notes](09-release-notes.md).)
 
 **DQ** — The data pins. 32 per pseudo-channel, bidirectional — which is why turning the bus
 around costs time.
@@ -82,7 +84,9 @@ PRE + ACT (~15× slower). Maximising hits is most of what a memory controller do
 
 ## Interfaces and standards
 
-**APB4** — Simple AMBA bus used here for configuration registers.
+**APB4** — Simple AMBA bus used here for configuration registers. (Rev 1.4: not integrated.
+`hbm4_csr`, the APB register block, is not instantiated, so `hbm4_sys_top` has no APB port and
+is configured through input ports; see [09 Release Notes](09-release-notes.md).)
 
 **AXI4 / CHI** — ARM SoC interconnect protocols. **Not** the controller's native interface;
 bridge in the fabric if needed ([08 §3](08-compliance-matrix.md)).
@@ -123,7 +127,8 @@ ECC reserves 2 of 32 columns. Lives in the controller, never in the fabric slice
 batches each direction to amortise turnaround.
 
 **ECC column cache** — 32 entries per PC, **direct-mapped by bank index**. Exact, not
-approximate: a bank has one open row and each row-half has one ECC column.
+approximate: a bank has one open row and each row-half has one ECC column. (Rev 1.4: not
+integrated; `hbm4_ecc_cache` is not instantiated.)
 
 **`HBM4_ADDR_SLICE`** — The ~200-gate block, shipped with the IP, that *your fabric*
 instantiates to map a system address to `{stack, pseudo-channel, block address}`.
@@ -152,7 +157,10 @@ row-hit batching happens without a CAM.
 `MEDIUM` (4 KB), `NUMA` (contiguous regions).
 
 **Supervisor** — The one global block: boot orchestration, unified CSR aperture, cross-stack
-RAS, DVFS, refresh phasing. Never in the data path.
+RAS, DVFS, refresh phasing. Never in the data path. (Rev 1.4: `hbm4_supervisor` does boot
+orchestration, interrupt aggregation and the performance-snapshot edge. There is no CSR
+aperture, because `hbm4_csr` is not integrated, and no DVFS logic; refresh phases are assigned
+in `hbm4_stack_top`.)
 
 **Transaction pool** — The 64-entry per-PC request store, threaded into per-bank, per-row
 linked lists.
@@ -162,7 +170,8 @@ comparison only on a hit. False positives cost a cycle; false negatives are impo
 construction.
 
 **Write-allocate elision** — Skipping the ECC read when a write stream fills all 15 fields of
-an ECC block. Keeps writes at 6.25% overhead instead of 12.5%.
+an ECC block. Keeps writes at 6.25% overhead instead of 12.5%. (Part of `hbm4_ecc_cache`; not
+integrated in Rev 1.4.)
 
 ---
 
@@ -170,15 +179,21 @@ an ECC block. Keeps writes at 6.25% overhead instead of 12.5%.
 
 **ECC (Error Correcting Code)** — Three independent layers here: **link ECC** (protects the
 interconnect), **on-die ECC** (inside the DRAM, invisible), and **inline system ECC**
-(end-to-end, stored in reserved columns).
+(end-to-end, stored in reserved columns). (Rev 1.4: inline system ECC is not integrated; its
+columns are reserved, but nothing encodes or checks stored data. Link ECC is integrated, with
+retry disabled, OPEN-9.)
 
-**MBIST** — Memory built-in self test. Needed for the write buffer and ECC cache.
+**MBIST** — Memory built-in self test. Needed for the write buffer and ECC cache (the ECC cache
+is not integrated in Rev 1.4).
 
 **Patrol scrub** — Background reads at lowest priority that find and correct latent errors
-before they accumulate into uncorrectable ones.
+before they accumulate into uncorrectable ones. (Rev 1.4: not integrated; `hbm4_scrub` is not
+instantiated.)
 
 **Poison** — Marking data as known-bad so a later reader is told rather than silently misled.
-Propagated, never re-reported — one fault yields one log entry.
+Propagated, never re-reported — one fault yields one log entry. (Rev 1.4: not available. Poison
+is stored in the inline-ECC field, and neither inline ECC nor the error log, `hbm4_err_log`, is
+integrated.)
 
 **PPR (Post Package Repair)** — Replacing a failed row with a spare. **Soft** is volatile;
 **hard** is permanent and irreversible.
@@ -188,10 +203,13 @@ mitigation.
 
 **SDC (Silent Data Corruption)** — Wrong data returned with no error indication. The failure
 mode inline system ECC exists to prevent, and the reason it is on by default despite costing
-6.25%.
+6.25%. (Rev 1.4: inline system ECC is not integrated. `hbm4_ecc_cache` is not instantiated
+and nothing encodes or checks stored data, although its 2 of 32 columns, 6.25% of capacity,
+are still reserved. See [09 Release Notes](09-release-notes.md).)
 
 **SECDED** — Single Error Correct, Double Error Detect. The baseline ECC strength; the code
-used here is stronger (single 4-bit-symbol correct).
+used here is Hsiao SEC-DED(266,256), not the stronger single-4-bit-symbol-correcting code once
+specified (OPEN-7).
 
 ---
 

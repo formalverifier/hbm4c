@@ -1,6 +1,6 @@
 # 06 — Verification Plan
 
-**HBM4 Memory Controller · Rev 1.3 · fully open-source toolchain**
+**HBM4 Memory Controller · Rev 1.4 · fully open-source toolchain**
 
 ---
 
@@ -186,6 +186,11 @@ property and still only be a sampling argument.
 | P-EC-1 | An ECC cache entry is never evicted with dirty fields unwritten |
 | P-EC-2 | Direct-mapped invariant: at most one ECC block in flight per bank |
 
+> **Status (Rev 1.4):** P-DIR-1 and P-DIR-2 are not implemented. No proof covers
+> `hbm4_dir_fsm`, so its embedded `a_burst_bounded` assertion is also unchecked (see
+> [formal/ASSUMPTIONS.md](../formal/ASSUMPTIONS.md)). P-EC-* are proved on `hbm4_ecc_cache`,
+> which is not instantiated in the design.
+
 ### 4.7 NHI, CSR, sequencer
 
 | ID | Property |
@@ -197,6 +202,11 @@ property and still only be a sampling argument.
 | P-CSR-2 | APB4 protocol compliance |
 | P-SEQ-1 | The sequencer never issues a DRAM command while a PC slice is active |
 | P-SEQ-2 | Script PC always in range; no unbounded loop without a `WAIT` |
+
+> **Status (Rev 1.4):** P-CSR-* are proved on `hbm4_csr`, which is not instantiated, so they say
+> nothing about the design as built. Rev 1.4 adds pool assertions `a_alloc_idx_free` and
+> `a_issue_idx_live` / `_addr` / `_tag`, which tie the exported pool indices that write data is
+> stored by to the entries actually allocated and issued.
 
 ### 4.8 The capacity limit, stated honestly
 
@@ -363,7 +373,7 @@ traffic proves the controller works on traffic that was never the problem.
 | DFI timing checker (§5.3) | any JEDEC violation |
 | Data-integrity scoreboard | corruption through RMW, coalescing, forwarding, poison, scrub, retry |
 | Ordering checker | the [§1.7](03-interface-spec.md) contract, especially same-block RAW |
-| NHI protocol assertions | host-side rule violations (H1–H5) — bind these into the customer's fabric adapter too |
+| NHI protocol assertions | host-side rule violations (H1–H5) — bind these into the customer's fabric adapter too (**Rev 1.4: not written**; H1 exists only as an assumption in `fv_nhi_target`) |
 | Liveness monitor | any request outstanding beyond its bound |
 | Credit conservation | over-issue or leak |
 
@@ -424,6 +434,14 @@ async def sequential_read_bandwidth(dut):
 **S12 deserves emphasis.** Signing off against placeholder timing proves the controller obeys
 timings that are not the ones in the silicon. Track it in
 [08-compliance-matrix.md](08-compliance-matrix.md).
+
+> **Status (Rev 1.4): signoff has not been run against these criteria.** S12 cannot be, until a
+> datasheet exists. Several criteria have no implementation in the repository: S2 (the regression runs
+> at reduced geometry, `FV_DEFINES ?= -DFV_SMALL`. `FV_DEFINES=` builds production geometry,
+> but only the timing and address-map proofs have been run that way, in their `prove` mode, and
+> no full-scale BMC at depth ≥ 40 exists), S3 (there is no `mcy`; the 77-mutation
+> `formal/mutate.sh` stands in for it), S8 (no coverage is collected) and S11 (there is no
+> Icarus flow). §15 lists what is covered.
 
 ---
 
@@ -492,6 +510,13 @@ tb/
   Makefile
 ```
 
+> **Status (Rev 1.4): the planned layout above is not the shipped one.** `formal/` holds 21
+> `fv_*.sv` wrappers (e.g. `fv_nhi_target.sv`, and `fv_addr_slice_miter.sv` in place of
+> `fv_addr_map.sv`), one `.sby` per block and `mutate.sh`; there is no `mcy/`. Simulation lives
+> in `sim/`: the reference model `hbm4_dram_model.py` (Python, not SystemVerilog), the cocotb
+> environment `testbench.py` / `sys_testbench.py`, the `tb_*.sv` wrappers, the `test_*.py`
+> suites and the `Makefile`. `tb/` is empty.
+
 ---
 
 ## 10. Customer re-verification
@@ -507,6 +532,12 @@ they can re-run signoff themselves:
 
 Steps 1 and 4 together are the deliverable that makes this IP re-verifiable rather than
 merely re-simulatable, and neither needs a licence.
+
+> **Status (Rev 1.4):** the `tb` targets in steps 2 and 3 do not exist (`tb/` is empty). Run
+> simulation from `sim/` instead: `make` (slice, reduced geometry), `make GEOM=full` (slice at
+> production geometry, including the efficiency measurement), `TOPLEVEL=tb_stack_top
+> MODULE=test_boot make` and `TOPLEVEL=tb_sys_top MODULE=test_system make`. Each runs the strict
+> lint gate first; see [sim/README.md](../sim/README.md).
 
 ---
 
@@ -548,14 +579,19 @@ bank group** — constraint C2, measured rather than argued.
 
 ## 15. Rev 1.0 — synthesis, and the rest of A1
 
-### Simulation coverage now
+### Simulation coverage now (Rev 1.4)
 
 | Suite | Level | Geometry | Result |
 |---|---|---|---|
-| `test_slice.py` | pseudo-channel slice | reduced | 9 pass, 1 skipped |
-| `test_slice.py` | pseudo-channel slice | **production** | **10/10 pass** |
-| `test_boot.py` | **stack** (64 slices + sequencer) | reduced | **6/6 pass** |
-| `test_system.py` | **system** (N_STACK stacks + supervisor) | reduced | **5/5 pass** |
+| `test_slice.py` | pseudo-channel slice | reduced | 11 pass, 1 skipped |
+| `test_slice.py` | pseudo-channel slice | **production** | **12/12 pass** |
+| `test_boot.py` | **stack** (4 slices + sequencer at reduced geometry) | reduced | **6/6 pass** |
+| `test_system.py` | **system** (2 stacks, 8 slices, + supervisor) | reduced | **5/5 pass** |
+
+Rev 1.4 added `test_write_data_tag_independence`, which drives colliding tags (one tag reused
+across outstanding writes, and tags 64 apart) with every write provably outstanding at once.
+It fails on Rev 1.3 RTL and passes on Rev 1.4. Before Rev 1.4, a plain `make` in `sim/` ran the
+lint gate and no tests, so check that a run reports its tests.
 
 The stack level had never been simulated before Rev 1.0. That is the whole explanation for
 OPEN-10: a boot path that produced commands and carried them nowhere passed lint, review and
@@ -589,10 +625,11 @@ against a real library before tapeout.
 
 ### What is still not covered
 
-- ~~The 256-slice system~~ — **simulated as of Rev 1.1** (5/5). Multi-stack boot, parallel
-  training, dead-stack failure propagation, and the perf-snapshot freeze edge are all covered.
-  Still not covered at this level: sustained multi-stack *traffic* (the tests exercise boot and
-  control, not concurrent data flow across stacks), and production geometry.
+- **The 256-slice system has never been simulated.** `hbm4_sys_top` is simulated at reduced
+  geometry only (2 stacks × 2 channels × 2 pseudo-channels = 8 slices), 5/5: multi-stack boot,
+  parallel training, dead-stack failure propagation, and the perf-snapshot freeze edge. Still
+  not covered at this level: any data traffic (the tests exercise boot and control only), and
+  production geometry, where the system only elaborates and lints.
 - **Signed timing and power.** No liberty file, no STA, no power estimate.
 - **CDC.** No open-source tool; hand review only.
 - **All (P) timing values.** Placeholders pending the device datasheet — gate S12, and the one

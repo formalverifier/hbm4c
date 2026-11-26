@@ -1,6 +1,6 @@
 # 07 — Performance Guide
 
-**HBM4 Memory Controller · Rev 1.3**
+**HBM4 Memory Controller · Rev 1.4**
 
 Expected numbers, how to choose an address map, how to tune, and how to debug a controller
 that is not delivering.
@@ -11,6 +11,13 @@ that is not delivering.
 
 Baseline: `N_STACK`=4, `SYSECC_EN`=1, `WBUF_DEPTH`=128, `ADDRMAP_MODE`=STREAM,
 `STACK_ILV`=FINE. Raw = 8.19 TB/s.
+
+> **Status (Rev 1.4):** the numbers in §1 are analytic, for the specified design. In the RTL,
+> `ADDRMAP_MODE` and `STACK_ILV` do not exist (the map is fixed `STREAM` with `FINE` stack
+> interleave), and the `CLOSE` policy is not implemented. Inline system ECC is not integrated:
+> `SYSECC_EN = 1` still reserves 2 of 32 columns (the capacity cost is real), but no ECC column
+> accesses are issued, so the 6.25% bandwidth cost below does not occur. Measured numbers are
+> at the end of this guide. See [09 Release Notes](09-release-notes.md).
 
 | Workload | Efficiency | Bandwidth |
 |---|---|---|
@@ -87,6 +94,12 @@ Method:
 ## 3. Tuning recipes
 
 Always: snapshot → measure → change **one** knob → re-measure.
+
+> **Status (Rev 1.4):** the recipes below use counters and registers (`ECC_RMW`, `AGE_TICK`,
+> `ADDRMAP_MODE`, …) from the register block, which is not integrated. QoS aging does not exist
+> (OPEN-11). The knobs that do exist are the `hbm4_sys_top` input ports (`cfg_wr_hi`,
+> `cfg_wr_lo`, `cfg_wr_burst`, `cfg_refi_pb`, `lcfg` hash masks, …), and the only performance
+> hook is the `perf_snapshot_req` / `perf_freeze` pulse.
 
 ### 3.1 Turnaround overhead too high
 
@@ -182,6 +195,11 @@ waiting on you. At 32 GB/s per pseudo-channel, a port that cannot accept a respo
 clock will cap that PC. Buffer in the fabric rather than back-pressuring the controller —
 back-pressure on `rsp_ready` propagates all the way to the DRAM bus and idles it.
 
+> **Status (Rev 1.4):** in the RTL it does not propagate. A stall that coincides with a
+> completion loses the response and its credit (OPEN-16 in
+> [formal/ASSUMPTIONS.md](../formal/ASSUMPTIONS.md)), so keep `rsp_ready` high. There is no
+> `IRQ_STATUS` bit 7 or `QUEUE_OCC`; see the note at the top of §3.
+
 ---
 
 ## 5. Scaling
@@ -235,17 +253,21 @@ costing more than 2% must fail the build.
 
 ## Measured results
 
-**Rev 1.0.** Everything above this section was derived from the timing parameters. This section
-is measured — `sim/test_slice.py::test_streaming_efficiency`, production geometry.
+**Rev 1.0, re-measured in Rev 1.4.** Everything above this section was derived from the timing
+parameters. This section is measured — `sim/test_slice.py::test_streaming_efficiency` and
+`test_streaming_sequential`, production geometry unless stated. Inline ECC is not integrated, so
+no ECC column accesses are included.
 
 | Workload | Measured |
 |---|---|
 | Sequential streaming reads, saturating | **98.8%** column-bus utilisation (1186 column commands / 1200 core clocks) |
-| Sequential streaming, bank-group alternation | **0.0%** of consecutive column pairs in the same bank group |
+| Sequential streaming, bank-group alternation | **4.8%** of consecutive column pairs in the same bank group (3 of 63) at production geometry; **0.0%** at reduced geometry |
 
-The second number is the reason for the first: constraint **C2** holds on *every* consecutive
-pair, so `tCCD_L` is never the limiter. That is what the address map exists to deliver
-([02 §5.1](02-architecture.md)), and it is now measured rather than argued.
+The second number is the reason for the first: constraint **C2** holds on all but 3 of 63
+consecutive pairs at production geometry (and on every pair at reduced geometry), so `tCCD_L`
+is rarely the limiter. That is what the address map exists to deliver
+([02 §5.1](02-architecture.md)), and it is now measured rather than argued. (Earlier revisions
+of this guide gave the reduced-geometry 0.0% as the production figure.)
 
 ### How to read 98.8%
 

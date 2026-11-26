@@ -1,26 +1,36 @@
 // ---------------------------------------------------------------------------
-// hbm4_wdata_ram -- write-data storage, held from request until the write is
+// hbm4_wdata_ram -- write-data storage, held from allocation until the write is
 // issued to the DRAM.
 //
 // WHY THIS BLOCK EXISTS.  Until Rev 1.2 the design had NO WRITE DATAPATH at all.
 // The NHI carried `req_wr` -- a direction bit -- and no data; the DFI adapter
 // had `dfi_rddata` in and nothing out.  A write issued a WR command carrying an
-// address, and no data ever reached the device.  docs/03 specifies the host side
-// of it (rules H3/H5 and the WD_SKEW parameter) and none of it was implemented.
+// address, and no data ever reached the device.
 //
-// INDEXED BY TAG, not by pool entry.  The transaction pool does not expose the
-// index it allocated, and the tag is already unique among outstanding
-// transactions -- that is a host obligation the interface spec already imposes
-// (docs/03 rule H2), and the NHI's credit accounting bounds the number
-// outstanding to TQ_DEPTH.  Using the tag therefore needs no change to the pool,
-// which is already the largest block in the slice.
+// INDEXED BY POOL ENTRY, not by the host's tag.  The pool entry is the one
+// identifier that is unique among in-flight transactions by construction: the
+// pool hands out a free entry on allocation (`alloc_idx`) and names the entry
+// it pops on issue (`issue_idx`), and no entry is reused before it is popped.
 //
-// A WRITE THAT ARRIVES WITHOUT DATA IS NOT DETECTED HERE.  This block stores
-// what it is given.  If the host violates H3 and supplies data late, the write
-// issues with whatever the RAM held -- which is the previous transaction's data
-// at that tag.  That is silent corruption, so `err_no_data` flags a read of an
-// entry that was never written since reset; it is a host-protocol error, and it
-// must be visible rather than inferred later from bad memory.
+// Rev 1.3 indexed this RAM by tag, and it was wrong twice over.  At production
+// geometry a tag is 8 bits and this RAM has TQ_DEPTH = 64 entries, so the index
+// was silently truncated and tags t and t+64 shared an entry.  And docs/03 rule
+// H2 requires tags to be unique among outstanding READS only, so a host that
+// follows the interface may legally reuse one tag across outstanding writes.
+// Either way a later write overwrote a queued write's data, and the queued write
+// then put the wrong bytes at a correct address with no error anywhere.  Formal
+// could not see it (under FV_SMALL the tag is exactly as wide as this index);
+// lint could (WIDTHTRUNC on every index), at production geometry only.
+//
+// THE CALLER STORES AT ALLOCATION, NOT AT REQUEST.  The pool entry is not known
+// until the request leaves the two-cycle address decode, so hbm4_pc_slice
+// carries the data down that pipeline alongside the tag and writes it here in
+// the cycle the pool allocates.
+//
+// `err_no_data` flags a write issued from an entry that holds no data since its
+// last issue.  With storage keyed by pool entry and written at allocation, that
+// is an INTERNAL fault -- a broken index or a lost store -- never a host error.
+// It must be visible rather than inferred later from bad memory.
 // ---------------------------------------------------------------------------
 module hbm4_wdata_ram
   import hbm4_pkg::*;
@@ -35,14 +45,14 @@ module hbm4_wdata_ram
   input  logic                    clk,
   input  logic                    rst_n,
 
-  // ---- capture, when a write request is accepted --------------------------
+  // ---- store, when the pool allocates a write ------------------------------
   input  logic                    wr_valid,
-  input  tag_t                    wr_tag,
+  input  tqidx_t                  wr_idx,
   input  logic [DW-1:0]           wr_data,
 
   // ---- fetch, when the column write issues --------------------------------
   input  logic                    rd_valid,
-  input  tag_t                    rd_tag,
+  input  tqidx_t                  rd_idx,
   output logic [DW-1:0]           rd_data,
 
   output logic                    err_no_data,   // issued a write with no data
@@ -53,26 +63,26 @@ module hbm4_wdata_ram
   logic [DW-1:0] mem [TQ_DEPTH];
   logic [TQ_DEPTH-1:0]   written;
 
-  assign rd_data     = mem[rd_tag];
+  assign rd_data     = mem[rd_idx];
   assign dbg_written = written;
 
   // Flagged combinationally on the issue cycle: by the time the command has left
   // the controller it is too late to do anything but report it.
-  assign err_no_data = rd_valid && !written[rd_tag];
+  assign err_no_data = rd_valid && !written[rd_idx];
 
   always_ff @(posedge clk) begin
     if (!rst_n) begin
       written <= '0;
     end else begin
       if (wr_valid) begin
-        mem[wr_tag]     <= wr_data;
-        written[wr_tag] <= 1'b1;
+        mem[wr_idx]     <= wr_data;
+        written[wr_idx] <= 1'b1;
       end
-      // Cleared on issue so a REUSED tag cannot silently inherit the previous
-      // transaction's data -- without this, a host that reuses a tag before
-      // supplying new data writes the old block to a new address.
-      if (rd_valid && !(wr_valid && (wr_tag == rd_tag)))
-        written[rd_tag] <= 1'b0;
+      // Cleared on issue so a REUSED entry cannot silently inherit the previous
+      // transaction's data -- without this, an entry re-allocated to a write
+      // whose store was lost would write the old block to a new address.
+      if (rd_valid && !(wr_valid && (wr_idx == rd_idx)))
+        written[rd_idx] <= 1'b0;
     end
   end
 

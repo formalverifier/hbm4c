@@ -5,18 +5,18 @@
 
         +----------Local Count, excluding submodules.
         | 
-    84072 wires
-   113178 wire bits
-     2540 public wires
-    31646 public wire bits
-       48 ports
-     1197 port bits
-    90240 cells
-    32718   $_AND_
-     8652   $_DFF_P_
-    11378   $_MUX_
-     6274   $_NOT_
-    25888   $_OR_
-     5311   $_XOR_
-       19   $scopeinfo
+   186504 wires
+   248946 wire bits
+     2898 public wires
+    65340 public wire bits
+       51 ports
+     1710 port bits
+   214333 cells
+    70572   $_AND_
+    30412   $_DFF_P_
+    33219   $_MUX_
+    12444   $_NOT_
+    59127   $_OR_
+     8538   $_XOR_
+       21   $scopeinfo
 

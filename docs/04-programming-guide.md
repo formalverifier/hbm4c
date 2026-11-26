@@ -1,9 +1,21 @@
 # 04 — Programming Guide
 
-**HBM4 Memory Controller · Rev 1.3**
+**HBM4 Memory Controller · Rev 1.4**
 
 For the firmware or driver engineer. Covers the register map, the boot sequence, runtime
 tuning, and error handling.
+
+> **Status (Rev 1.4): there is no register block in the RTL.** `hbm4_csr` exists but is not
+> instantiated, so `hbm4_sys_top` has no APB port and none of the registers below can be read
+> or written. That includes `ID`, `VERSION`, the timing sets and `AMAP_LOCK`, so the boot-time
+> `VERSION` check cannot be done yet. The controller is configured through input ports
+> (`tcfg`, `lcfg`, `cfg_wr_hi`, `cfg_wr_lo`, `cfg_wr_burst`, `cfg_wr_age_limit`,
+> `cfg_wr_preempt`, `cfg_refi_pb`, `cfg_rfm_thresh`, `cfg_raa_imt`, `cfg_rfm_en`, `cfg_lp_en`,
+> `cfg_pd_thresh`, `cfg_sr_thresh`, `irq_mask`; see `rtl/slice/hbm4_sys_top.sv`), and booted
+> with `boot_start` / `ctrl_ready` / `boot_failed` as described in
+> [Rev 1.0 — boot handshake](#rev-10--boot-handshake) at the end of this document. The rest of
+> this guide is the specification for when the register block is integrated. See
+> [09 Release Notes](09-release-notes.md).
 
 ---
 
@@ -105,6 +117,11 @@ the timing block. After locking, writes are dropped, `pslverr` asserts, and
 
 ## 2. Boot sequence
 
+> **Status (Rev 1.4):** this sequence needs the register block, which is not integrated. The
+> boot script is a fixed ROM (`hbm4_seq_rom`), so there is no script to load. What the RTL
+> supports is the port-level handshake in
+> [Rev 1.0 — boot handshake](#rev-10--boot-handshake).
+
 ```c
 void hbm4_boot(void) {
     /* 1. Identify and sanity-check the build against what the driver expects */
@@ -203,6 +220,9 @@ imbalance — the thing you are usually hunting — is unmeasurable.
 
 ## 4. DVFS
 
+> **Status (Rev 1.4): not implemented.** There is no DVFS logic and no double-buffered timing
+> set. `tcfg` is a plain input port.
+
 ```c
 int hbm4_dvfs(int stack, const timing_t *new_timings, int new_freq) {
     wr32(ST(stack, TIMING_SHADOW_SEL), 1);        /* target the shadow set */
@@ -244,6 +264,12 @@ int hbm4_dvfs(int stack, const timing_t *new_timings, int new_freq) {
 | 8 | Write to a locked register | warn | driver bug — find it |
 | 9 | Training or retrain failure | **fatal** | stack unusable |
 | 10 | Scrub found an uncorrectable error | **error** | latent fault; retire the page |
+
+> **Status (Rev 1.4):** the table above is the specification. As built, `hbm4_supervisor`
+> drives `irq_status` as follows: bit 0 is any stack error (a read-FIFO overflow or underflow, or
+> a response stall, in any slice), bit 1 is `boot_failed`, bit 2 is `ctrl_ready`, and bits 7:4
+> are the per-stack error flags. `irq = |(irq_status & ~irq_mask)`. There is no error log
+> (`hbm4_err_log`), no poison and no scrub, so §5.2–§5.4 describe absent hardware.
 
 ### 5.2 Reading the error log
 
@@ -318,6 +344,11 @@ The driver's boot responsibilities changed when the training path was implemente
 2. Program the address map, hash masks, `ECC_EN` and the timing set.
 3. Set **`AMAP_LOCK`**. Post-lock writes to those registers are refused with `pslverr` and
    raise an interrupt — that is a driver bug, and it is reported rather than silently applied.
+
+> **Status (Rev 1.4):** steps 2 and 3 assume the register block, which is not integrated. As
+> built, drive `tcfg`, `lcfg` and the `cfg_*` ports before `boot_start` and hold them stable.
+> There is no `AMAP_LOCK`, so nothing refuses a later change. Steps 4–6 are exactly what the RTL
+> does.
 4. Assert `boot_start`.
 5. Wait for `ctrl_ready`, checking `boot_failed`.
 6. Only then issue traffic.

@@ -1,6 +1,6 @@
 # 03 — Interface Specification
 
-**HBM4 Memory Controller · Rev 1.3**
+**HBM4 Memory Controller · Rev 1.4**
 
 Signal-level definition of every controller boundary, with timing diagrams. This is the
 document to hand to whoever writes the fabric adapter, the PHY glue, or the driver.
@@ -12,6 +12,12 @@ Three interfaces:
 | **NHI** — Native Host Interface | host ↔ controller | `clk_core` (1 GHz) | 256 (one per pseudo-channel) |
 | **DFI** — DDR PHY Interface | controller ↔ PHY | `clk_core` = `dfi_clk` | 128 (one per HBM channel) |
 | **APB4** — configuration | host ↔ controller | `clk_cfg` | 1 |
+
+> **Status (Rev 1.4): this is the specification. The RTL differs in places, and each section
+> below says how.** In short: `hbm4_sys_top` runs on one clock (`clk`) and has no APB port,
+> because `hbm4_csr` is not integrated. Configuration arrives on input ports instead (`tcfg`,
+> `lcfg`, `cfg_*`, `irq_mask`), and boot uses `boot_start` / `ctrl_ready` / `boot_failed`. See
+> [09 Release Notes](09-release-notes.md).
 
 Every timing diagram below has an editable WaveDrom source in [`waves/`](waves/). Paste the
 `.json` into wavedrom.com or open it with the WaveDrom VS Code extension.
@@ -29,6 +35,16 @@ exclusive access, no protocol FSM, and **no `ready` on the request channel**.
 One port per pseudo-channel. Port *i* is hardwired to pseudo-channel *i*. There is no routing
 inside the controller — [`HBM4_ADDR_SLICE`](#4-hbm4_addr_slice) in your fabric decides which
 port a request goes to.
+
+> **Status (Rev 1.4): what the RTL implements.** Request: `req_valid`, `req_wr`, `req_blk`,
+> `req_tag` (8 b), `req_qos` (2 b), **`req_data` (256 b, valid in the same beat as its
+> request)** and `req_credit`. Response: `rsp_valid`, `rsp_ready`, `rsp_tag`, `rsp_data`,
+> `rsp_err`, `rsp_wack`. **Not implemented:** the separate write-data channel of §1.3
+> (`wd_valid` / `wd_ready` / `wd_data`) and `WD_SKEW`, `req_be` (every write is a full 32 B
+> block), `req_poison` and `req_last`. `rsp_err` is 0, 1 (link-ECC corrected) or 2 (link-ECC
+> uncorrectable). **`rsp_err = 3` is never generated:** a request whose block address
+> decodes beyond capacity is dropped with no response, and its credit never returns. That is an
+> open item, see [09 Release Notes](09-release-notes.md).
 
 ### 1.2 Request channel — host → controller
 
@@ -82,6 +98,9 @@ first. Key on the tag, never on arrival order.
 
 **Write with data skew.** Requests at cycles 1–2, data at cycles 3–4, `wack` later.
 
+> **Status (Rev 1.4):** this shows the specified `wd` channel. In the RTL, write data arrives
+> on `req_data` in the request's own beat, with no skew.
+
 ![NHI write](waves/wave-03-nhi-write.svg)
 
 **Credit flow control.** A credit *is* the permission to send; there is no request-channel
@@ -104,6 +123,18 @@ data silently. The verification kit ships NHI protocol assertions
 ([06-verification-plan.md §4.7](06-verification-plan.md)) — bind them to your fabric adapter
 and leave them enabled in simulation.
 
+> **Status (Rev 1.4):** H3 and H5 do not apply to the RTL as built, because write data travels
+> with its request. H2 is unchanged, and it is sufficient: write data is stored per transaction
+> (by transaction-pool entry), so reusing a tag across outstanding writes is safe. Rev 1.3
+> stored it by tag, and a tag reused that way, or two tags 64 apart, corrupted a queued write.
+> **H4 is stricter in the RTL than written: do not deassert `rsp_ready` at all.** The slice does
+> not honour back-pressure, so any stall that coincides with a completion loses that response
+> and its credit (OPEN-16 in [formal/ASSUMPTIONS.md](../formal/ASSUMPTIONS.md)). The stall
+> watchdog is fixed at 65 535 cycles (there is no `RSP_STALL_MAX` parameter) and reported on
+> `err_stall`, which feeds `irq_status`. **No NHI protocol checker ships:** the assertions named
+> above do not exist in the repository, and H1 exists only as an assumption inside
+> `fv_nhi_target`.
+
 ### 1.7 Ordering contract
 
 **Guaranteed:**
@@ -112,6 +143,13 @@ and leave them enabled in simulation.
   data (enforced by the write-buffer hazard check).
 - **G2** Writes to the same block on the same port complete in order.
 - **G3** `rsp_wack` is issued only once the write is visible to subsequent reads.
+
+> **Status (Rev 1.4): G1 does not hold when two writes to the same block are queued.** The
+> second write merges into the first one's hazard entry, and the first write's issue clears it,
+> so a following read can overtake the second write and return the first write's data
+> (OPEN-15, confirmed in simulation). G1 holds when only one write to the block is queued. Under
+> mixed traffic some `rsp_wack` responses are lost altogether (OPEN-17). See
+> [formal/ASSUMPTIONS.md](../formal/ASSUMPTIONS.md).
 
 **Not guaranteed:**
 
@@ -143,6 +181,15 @@ and data sub-buses.
 | `dfi_rddata` | 256 | |
 | `dfi_rddata_valid` | 1 | |
 | `dfi_lecc_*` | per-direction sideband | Link ECC (§10.1 of the architecture doc) |
+
+> **Status (Rev 1.4):** as built, each pseudo-channel has `dfi_row_valid` / `_cmd` / `_bank` /
+> `_addr`, `dfi_col_valid` / `_cmd` / `_bank` / `_addr`, `dfi_wrdata_valid`, `dfi_wrdata`,
+> `dfi_rddata_valid`, `dfi_rddata` and `dfi_rdcode` (the read-side link-ECC code). There is no
+> `dfi_wrdata_mask` and no write-side link-ECC sideband. During boot (until the stack's
+> sequencer finishes), every pseudo-channel's **row** bus carries the boot commands, `ROW_PREA` or
+> `ROW_MRS`, broadcast on phase 0. The MRS index and opcode travel on the per-stack
+> `dfi_mrs_index` / `dfi_mrs_opcode` buses, and PHY training steps use `phy_req`, `phy_op`,
+> `phy_arg` and `phy_ack`.
 
 ### 2.2 Steady state — the three constraints on one screen
 
@@ -185,15 +232,29 @@ real value is measured during training (boot step 10) and written to a CSR.
 > **Integration note.** If your PHY's `dfi_rddata_valid` latency is not deterministic within a
 > known bound, tell us. The FIFO handles jitter; it does not handle unbounded latency.
 
+> **Status (Rev 1.4):** the FIFO carries the transaction's tag, not its pool index, and the
+> measured latency has no CSR to go to.
+
 ### 2.8 Mode-register access
 
 MRS travels on the column bus. The stack sequencer serialises it against traffic with a
 per-PC `mrs_request` handshake: quiesce the PC, issue, resume. Used for init programming,
 temperature polling, on-die ECC status, PPR, and lane repair.
 
+> **Status (Rev 1.4):** MRS does not use the column bus. During boot, while the stack's slices
+> are gated off, `ROW_MRS` is broadcast on every pseudo-channel's row bus (phase 0), with its
+> index and opcode on the per-stack `dfi_mrs_index` / `dfi_mrs_opcode` outputs. There is no
+> `mrs_request` handshake, and only init programming is implemented. There is no runtime MRS, temperature or on-die ECC polling, PPR
+> or lane repair.
+
 ---
 
 ## 3. APB4 — configuration
+
+> **Status (Rev 1.4): not integrated.** `hbm4_csr` exists but is not instantiated, so
+> `hbm4_sys_top` has no APB port and no register map. It is configured through input ports
+> (see `rtl/slice/hbm4_sys_top.sv`). This section is the specification for when the block is
+> connected. See [09 Release Notes](09-release-notes.md).
 
 Standard APB4 on `clk_cfg`, 32-bit data, 16-bit address within each window.
 
@@ -243,6 +304,11 @@ highest-consequence, lowest-visibility failure mode in the system, which is why:
   ([06-verification-plan.md](06-verification-plan.md), P-MAP-3);
 - the hash CSRs are **lockable**, and the driver locks them before enabling traffic.
 
+> **Status (Rev 1.4):** the module as shipped takes no parameters (widths come from
+> `hbm4_pkg`), and `cfg` is a `slice_cfg_t` holding the stack and pseudo-channel hash masks,
+> driven by you. The controller's own bank hash arrives on `hbm4_sys_top.lcfg`. There are no
+> CSRs, so nothing is lockable, and keeping the two in agreement is the integrator's job.
+
 ---
 
 ## 5. Parameter summary
@@ -257,5 +323,10 @@ Parameters that change the interfaces:
 | `SYSECC_EN` | 1 | usable capacity 15/16; enables `req_poison` |
 | `RSP_STALL_MAX` | 256 | when a stalled `rsp_ready` raises an IRQ |
 | `RD_FIFO_DEPTH` | 32 | maximum tolerable PHY read round trip |
+
+> **Status (Rev 1.4):** `N_STACK`, `TQ_DEPTH` and `SYSECC_EN` are `hbm4_pkg` parameters, and
+> `RD_FIFO_DEPTH` is a `hbm4_pc_slice` parameter. `WD_SKEW` and `RSP_STALL_MAX` do not exist.
+> `SYSECC_EN` reserves the ECC columns (capacity 15/16), but enables no `req_poison`, because
+> neither poison nor inline ECC is integrated.
 
 Full parameter list: [05-integration-guide.md](05-integration-guide.md).

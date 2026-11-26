@@ -29,9 +29,11 @@ import os
 if os.environ.get("GEOM", "small") == "full":
     N_BANK, N_BG, N_ROW, N_COL_DATA = 32, 4, 32768, 30
     TQ_DEPTH = 64
+    TAG_W = 8
 else:
     N_BANK, N_BG, N_ROW, N_COL_DATA = 8, 2, 8, 15
     TQ_DEPTH = 4      # initial credits per NHI port (docs/03 §7)
+    TAG_W = 2         # narrowed under FV_SMALL (hbm4_pkg)
 
 
 class DfiMonitor:
@@ -110,29 +112,20 @@ class NhiDriver:
         # a perfectly correct controller, because nothing is ever completed to
         # return a credit for.  docs/03 §7.
         self.credits = TQ_DEPTH
-        # Tags must be UNIQUE among outstanding transactions -- docs/03 rule H2,
-        # and the write-data path depends on it (hbm4_wdata_ram is indexed by
-        # tag). A driver that cycles tags round-robin regardless of what is in
-        # flight violates that: the pool issues by bank rather than in request
-        # order, so an early tag can still be queued long after later ones have
-        # completed, and reusing it overwrites its write data with a newer
-        # block's. That is a host-protocol violation, not a controller bug, but
-        # it corrupts memory just the same -- so the driver must model a
-        # conforming host.
+        # Tags are kept unique across ALL outstanding transactions, which is
+        # stricter than docs/03 rule H2 requires (reads only) and keeps every
+        # response unambiguous to attribute. The pool issues by bank, not in
+        # request order, so a tag is only reusable once its response is back.
+        #
+        # Write data does NOT depend on this. Until Rev 1.4 hbm4_wdata_ram was
+        # indexed by tag and a reused tag overwrote a queued write's data; it is
+        # now indexed by pool entry. test_write_data_tag_independence drives the
+        # colliding patterns this driver avoids.
         self.free_tags = list(range(TQ_DEPTH))
         self.inflight = {}
         self.outstanding = {}
         self.completed = []
         self.next_tag = 0
-        # Tags must be UNIQUE among outstanding transactions -- docs/03 rule H2 --
-        # and the write-data path depends on it, since hbm4_wdata_ram is indexed
-        # by tag. Cycling tags round-robin regardless of what is in flight
-        # violates that: the pool issues by BANK, not in request order, so an
-        # early tag can still be queued long after later ones completed, and
-        # reusing it overwrites its write data with a newer block's. A
-        # host-protocol violation rather than a controller bug -- but it corrupts
-        # memory just the same, so the driver has to model a conforming host.
-        self.free_tags = list(range(TQ_DEPTH))
 
     async def credit_counter(self):
         while True:

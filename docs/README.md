@@ -1,6 +1,6 @@
 # HBM4 Memory Controller IP — Documentation
 
-**Rev 1.3** · configurable HBM4 controller for bandwidth-first accelerators
+**Rev 1.4** · configurable HBM4 controller for bandwidth-first accelerators
 · 8.19 TB/s raw · 256 pseudo-channels · fully open-source verification flow
 
 ---
@@ -28,7 +28,7 @@
 | **03** | [Interface Specification](03-interface-spec.md) | NHI, DFI, APB4 signal lists, rules, ordering contract, all timing diagrams |
 | **04** | [Programming Guide](04-programming-guide.md) | Register map, boot sequence, runtime tuning, DVFS, error handling |
 | **05** | [Integration Guide](05-integration-guide.md) | Parameters, clocking, reset, PHY, DFT, floorplan, checklist, common mistakes |
-| **06** | [Verification Plan](06-verification-plan.md) | SymbiYosys formal + Verilator/cocotb simulation, ~60 properties, signoff criteria |
+| **06** | [Verification Plan](06-verification-plan.md) | SymbiYosys formal + Verilator/cocotb simulation, 21 proof blocks (161 wrapper assertions plus RTL-embedded ones, 101 covers), signoff criteria |
 | **07** | [Performance Guide](07-performance-guide.md) | Expected numbers, address-map selection, tuning recipes, low-bandwidth debug tree |
 | **08** | [Compliance Matrix](08-compliance-matrix.md) | Feature support, and every value that must be confirmed before signoff |
 | **09** | [Release Notes](09-release-notes.md) | Versioning, changelog, upgrade notes, roadmap |
@@ -93,6 +93,12 @@ Only Python 3 is needed — no Node, no drawio CLI, no wavedrom install.
    bits, so fetching ECC costs one column access — no activate, no precharge. 6.25% of
    capacity and bandwidth, on by default.
 
+   > **Status (Rev 1.4): not integrated.** `hbm4_ecc_cache` is not instantiated, so nothing
+   > encodes or checks stored data. The address map still reserves the 2 of 32 columns
+   > (`div30`): 6.25% of capacity is reserved for an absent feature. No ECC column accesses are
+   > issued, so measured bandwidth contains no ECC overhead. See
+   > [09 Release Notes](09-release-notes.md).
+
 5. **There is no crossbar, by design.** Address slicing happens in *your* fabric using
    `HBM4_ADDR_SLICE`, which ships with the IP and is formally proved equivalent to the
    controller's own decode ([03 §4](03-interface-spec.md)).
@@ -101,21 +107,35 @@ Only Python 3 is needed — no Node, no drawio CLI, no wavedrom install.
 
 ## Project state
 
-**Rev 1.0 is an implemented, verified release.** 32 SystemVerilog modules, lint-clean at
-`-Wall`, with the full 256-pseudo-channel system elaborating at production geometry.
+**Rev 1.4 is implemented, and verified with the gaps stated here.** 31 SystemVerilog modules
+and 2 packages, lint-clean at `-Wall` at production geometry (the full 256-pseudo-channel
+system) and at reduced geometry. **Five specified modules are not instantiated**, so their
+features are absent from the design: `hbm4_csr` (the APB register block: there is no register
+map, and `hbm4_sys_top` is configured through input ports), `hbm4_ecc_cache` (inline system
+ECC), `hbm4_ecc_init` (ECC initialisation), `hbm4_err_log` (error log) and `hbm4_scrub`
+(patrol scrub). See [09 Release Notes](09-release-notes.md).
 
 | Evidence | State |
 |---|---|
-| Formal (SymbiYosys) | 20 blocks, **40/40 proof tasks pass**, 71-mutation coverage harness |
-| Simulation — slice | **10/10** at production geometry |
-| Simulation — stack boot | **6/6** |
-| Simulation — full system | **none** |
+| Lint (Verilator `-Wall`) | **clean** at production geometry (256 slices) and at reduced geometry |
+| Instantiation check | **fails** while the five modules above are unconnected |
+| Formal (SymbiYosys) | 21 blocks, **42/42 proof tasks pass**, 77-mutation coverage harness; 5 of the blocks prove unconnected modules |
+| Simulation — slice | **12/12** at production geometry |
+| Simulation — stack boot | **6/6** at reduced geometry |
+| Simulation — system | **5/5** at reduced geometry (2 stacks, 8 slices), boot and control only; the 256-slice system has **never been simulated** |
 | Synthesis | area and logic depth measured; **no signed timing** |
+| Known defects | **open:** stale read with two queued writes to a block (OPEN-15), lost responses under `rsp_ready` stall (OPEN-16), lost write acks under mixed traffic (OPEN-17), out-of-range requests dropped (OPEN-13) |
 
 **Before committing to this IP, read [01 §Verification status](01-product-overview.md) and
 [formal/ASSUMPTIONS.md](../formal/ASSUMPTIONS.md).** The short version: 1 GHz operation is not
 yet proven against a real library, every DRAM timing value is a placeholder marked **(P)**
-pending the device datasheet, and the multi-stack system level has never been simulated.
+pending the device datasheet, the 256-slice production system has never been simulated (the
+system top runs only at reduced geometry, for boot and control), and five specified features
+(the APB register map, inline system ECC, ECC initialisation, the error log and patrol scrub)
+are not connected. **Three defects found in the Rev 1.4 review are open, and each loses data or
+responses in normal operation:** a second queued write to the same block loses read-after-write
+protection, `rsp_ready` back-pressure drops responses, and write acknowledgements are lost under
+mixed traffic ([09 Release Notes](09-release-notes.md)).
 
 > **Highest-impact open item: burst length.** The design assumes BL8 / 32 B, scaled from
 > HBM3 where the arithmetic checks out exactly. If HBM4 defines BL16 / 64 B, a burst becomes
@@ -133,22 +153,23 @@ docs/          this documentation set
 tools/         figure and waveform generators (Python 3, no dependencies)
   figlib.py    .drawio.svg emitter: mxGraph XML + matching SVG from one description
   wavelib.py   WaveDrom-subset renderer
-rtl/           32 SystemVerilog modules, lint-clean at -Wall
+rtl/           31 SystemVerilog modules + 2 packages, lint-clean at -Wall
   pkg/         geometry, types, timing sets
   fabric/      address slicing shipped to the customer's fabric
   fe/          host front-end: NHI, decode, write buffer
   core/        scheduler: timing engine, bank state, dual arbiter, refresh
   dfi/         PHY handshake, read-pointer FIFO
-  ras/         inline ECC, scrub, error log, link ECC
-  global/      CSR, power, boot sequencer + script ROM, supervisor
+  ras/         inline ECC, scrub, error log, link ECC -- only link ECC is integrated
+  global/      CSR, power, boot sequencer + script ROM, supervisor -- CSR not integrated
   slice/       pseudo-channel slice, stack top, system top
-formal/        20 SymbiYosys proof wrappers + 72-mutation coverage harness
+formal/        21 SymbiYosys proof wrappers + 77-mutation coverage harness
   SCALING.md   why reduced-geometry results transfer -- and where they do not
   ASSUMPTIONS.md   every assumption and open item, stated plainly
 sim/           cocotb 2.0.1 + Verilator 5.050, independent JEDEC timing checker
   README.md    including the ways the checker itself was wrong first
-  test_slice.py  10/10 at production geometry, incl. measured bus efficiency
+  test_slice.py  12/12 at production geometry, incl. measured bus efficiency
   test_boot.py   6/6 boot sequence at the stack level
+  test_system.py 5/5 system boot and control, reduced geometry only (8 slices)
 syn/           Yosys synthesis: area, logic depth, loop check
   README.md    what an open-source flow can and cannot tell you about timing
 ```

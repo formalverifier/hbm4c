@@ -53,4 +53,13 @@ lint:
 	verilator --lint-only -Wall -Wno-DECLFILENAME $(GEOM_DEF) \
 	  $(VERILOG_SOURCES) --top-module $(TOPLEVEL)
 
+# The gate has to be wired, not just written. `lint` is the first target in
+# this file, so until Rev 1.4 it was make's DEFAULT GOAL: a bare `make` linted
+# and ran no tests at all, while every instruction in README.md said `make` --
+# a run that reports success having tested nothing. Pin the goal to cocotb's
+# `all` (which is `sim`), and hang the lint gate off `sim` so it cannot be
+# skipped by accident.
+.DEFAULT_GOAL := all
+sim: lint
+
 include $(shell cocotb-config --makefiles)/Makefile.sim

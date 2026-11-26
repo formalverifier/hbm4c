@@ -5,7 +5,7 @@
 # as dbg_written -- those are inductive. p_data_integrity is not, because it
 # needs "for EVERY entry, the array holds what was written there", and the array
 # is only observable through the addressed read port. Stating it for the read
-# tag alone leaves the induction step free to start from a state where some
+# index alone leaves the induction step free to start from a state where some
 # OTHER entry already disagrees.
 #
 # Making the array observable would close it -- and would cost a TQ_DEPTH:1 mux
@@ -13,7 +13,7 @@
 # technique was tried and reverted on hbm4_rd_ptr_fifo for the same reason
 # (ASSUMPTIONS.md OPEN-6); recorded here as OPEN-12 rather than left implicit.
 #
-# Depth 16 covers write, read-back, tag reuse and the no-data path several times
+# Depth 16 covers write, read-back, entry reuse and the no-data path several times
 # over for a 4-entry configuration.
 [tasks]
 bmc

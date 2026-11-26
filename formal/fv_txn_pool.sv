@@ -34,17 +34,20 @@ module fv_txn_pool
   row_t              head_wrow[N_BANK];
   pc_addr_t          issue_addr;
   tag_t              issue_tag;
+  // Checked by a_alloc_idx_free / a_issue_idx_* inside the pool itself, where
+  // the entry arrays are visible.
+  tqidx_t            alloc_idx, issue_idx;
   logic [TQ_IDX_W:0] occupancy, occ_lists;
 
   hbm4_txn_pool dut (
     .clk (clk), .rst_n (rst_n),
     .alloc_valid (alloc_valid), .alloc_wr (alloc_wr), .alloc_addr (alloc_addr),
     .alloc_bank (alloc_bank), .alloc_tag (alloc_tag), .alloc_qos (alloc_qos),
-    .alloc_ready (alloc_ready),
+    .alloc_ready (alloc_ready), .alloc_idx (alloc_idx),
     .pend_rd (pend_rd), .pend_wr (pend_wr), .pend_urgent (pend_urgent),
     .head_row (head_row), .head_wrow (head_wrow),
     .issue_valid (issue_valid), .issue_bank (issue_bank), .issue_dir (issue_dir),
-    .issue_addr (issue_addr), .issue_tag (issue_tag),
+    .issue_addr (issue_addr), .issue_tag (issue_tag), .issue_idx (issue_idx),
     .occupancy (occupancy), .occ_lists (occ_lists)
   );
 

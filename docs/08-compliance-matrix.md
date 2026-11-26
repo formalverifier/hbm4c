@@ -1,6 +1,6 @@
 # 08 — Compliance Matrix
 
-**HBM4 Memory Controller · Rev 1.3**
+**HBM4 Memory Controller · Rev 1.4**
 
 What this controller claims, what it does not, and every value that must be confirmed before
 you can sign off. Written to be handed to a customer's verification lead unedited.
@@ -16,6 +16,7 @@ you can sign off. Written to be handed to a customer's verification lead unedite
 | ⚠️ **Assumed** | Implemented against an **assumption** about the device. Confirm against JESD270-4 before signoff. |
 | ❌ **Not supported** | Deliberately out of scope. Rationale given. |
 | 🔲 **Customer-provided** | Outside the IP boundary |
+| 🚧 **Not in the RTL (Rev 1.4)** | Specified, but not built, or built and not integrated. The note says which. Added in Rev 1.4: several rows below were previously marked ✅ or 🔶 without the RTL to back them. |
 
 ---
 
@@ -29,62 +30,62 @@ you can sign off. Written to be handed to a customer's verification lead unedite
 | Independent per-pseudo-channel operation | ✅ | no shared state between PCs |
 | Separate row and column command buses | ✅ | dual arbiter, both issue per clock |
 | ACT / PRE / RD / WR | ✅ | |
-| Auto-precharge (RDA / WRA) | ✅ | `PAGE_POLICY = CLOSE` |
+| Auto-precharge (RDA / WRA) | 🚧 | specified as `PAGE_POLICY = CLOSE`; not implemented, because every column command is RD or WR |
 | Bank groups | ⚠️ | **assumed 4 BG × 8 banks = 32.** Confirm. |
 | Burst length BL8, 32 B granularity | ⚠️ | **DECIDED, Rev 0.4.** Chosen on three grounds (§4.2). Still requires datasheet confirmation, but it is now the implemented and proved baseline, not an open question. |
 | BL16 / 64 B granularity | 🔶 | parameterised, but not the verified baseline |
-| Stack heights 4/8/12/16-high | 🔶 | via `ROW_BITS` / `SID_BITS`; only 16-high is the verified baseline |
-| Multi-stack (1/2/4/8) | ✅ | `N_STACK`; non-power-of-two needs `STACK_ILV != FINE` |
+| Stack heights 4/8/12/16-high | 🚧 | `ROW_BITS` / `SID_BITS` do not exist; the geometry is fixed in `hbm4_pkg` (the 16-high baseline) |
+| Multi-stack (1/2/4/8) | ✅ | `N_STACK`, in `hbm4_pkg`. Power-of-two only: `STACK_ILV` does not exist, so the map is fixed `FINE` |
 
 ### 2.2 Refresh
 
 | Feature | Status | Notes |
 |---|---|---|
-| All-bank refresh (REFab) | ✅ | supported but not the default — ~9% overhead |
+| All-bank refresh (REFab) | 🚧 | encoded and tracked by the timing engine and bank state, but never issued; refresh is per-bank only |
 | Per-bank refresh (REFsb) | ✅ | **default**; ~3% overhead |
 | Refresh postpone / pull-in (±8) | ✅ | `ref_debt` credit engine |
 | Opportunistic refresh scheduling | ✅ | merges PRE→REF in idle bank windows |
-| Temperature-based `tREFI` switching | ✅ | polls the DRAM temperature register |
-| Global cross-stack refresh phasing | ✅ | supervisor-assigned offsets |
+| Temperature-based `tREFI` switching | 🚧 | not implemented; nothing polls the temperature register |
+| Global cross-stack refresh phasing | ✅ | per-stack offsets, assigned in `hbm4_stack_top` (not by the supervisor) |
 | RFM (Refresh Management) | ✅ | per-bank RAA counters |
-| **DRFM (Directed RFM)** | ⚠️ | **assumed supported.** If the device lacks it, `RFM_MODE=RFM` is the fallback at higher cost. |
+| **DRFM (Directed RFM)** | ⚠️ | **assumed supported.** If the device lacks it, `RFM_MODE=RFM` is the fallback at higher cost. (Rev 1.4: the RTL issues one per-bank `ROW_RFM` command, and there is no `RFM_MODE` parameter.) |
 
 ### 2.3 Data protection
 
 | Feature | Status | Notes |
 |---|---|---|
-| Link ECC generate / check | ⚠️ | implemented; **code definition assumed** — confirm against JESD270-4 |
-| Link ECC transparent read retry | ✅ | bounded at `LECC_RETRY_MAX` = 3 |
-| On-die ECC status polling | ✅ | via mode registers, every `ODECC_POLL_MS` |
-| `ALERT_n` capture | ✅ | timestamped, raises IRQ |
-| Inline system ECC | ✅ | **Hsiao SEC-DED(266,256)** — single correct, double detect. 6.25% overhead, on by default. **Not** symbol-correcting; see §4.3. |
-| Poison generate / propagate | 🔶 | requires `SYSECC_EN` |
-| Patrol scrub | 🔶 | requires `SYSECC_EN`; on by default |
-| Soft / hard PPR | ✅ | scripted, firmware-invoked |
-| Spare lane repair | ✅ | scripted; **mechanism is PHY-vendor-specific** |
-| ECS (Error Check and Scrub, DRAM-internal) | ❌ | not exposed. If the device supports it, controller-side patrol scrub is the equivalent. |
+| Link ECC generate / check | ⚠️ | **check only**, on the read return path; no write-side code is generated. **Code definition assumed** — confirm against JESD270-4 |
+| Link ECC transparent read retry | 🚧 | disabled: `cfg_retry_en` is tied to 0 (OPEN-9), because no re-issue path exists. A link uncorrectable returns `rsp_err = 2` |
+| On-die ECC status polling | 🚧 | not implemented |
+| `ALERT_n` capture | 🚧 | not implemented; there is no `ALERT_n` input |
+| Inline system ECC | 🚧 | **Not integrated:** `hbm4_ecc_cache` is not instantiated, so nothing encodes or checks stored data, yet 2 of 32 columns (6.25%) stay reserved. Specified as **Hsiao SEC-DED(266,256)** — single correct, double detect, **not** symbol-correcting (§4.3); that codec exists and is proved. |
+| Poison generate / propagate | 🚧 | not integrated: it needs inline ECC, and there is no `req_poison` |
+| Patrol scrub | 🚧 | not integrated: `hbm4_scrub` is not instantiated |
+| Soft / hard PPR | 🚧 | not implemented: the boot script is a fixed ROM, and there is no runtime mode-register path |
+| Spare lane repair | 🚧 | not implemented; **mechanism is PHY-vendor-specific** |
+| ECS (Error Check and Scrub, DRAM-internal) | ❌ | not exposed. If the device supports it, controller-side patrol scrub is the equivalent (not integrated in Rev 1.4). |
 
 ### 2.4 Power
 
 | Feature | Status | Notes |
 |---|---|---|
-| Controller clock gating | ✅ | per PC, 4 idle clocks |
-| DRAM power-down (PD) | ✅ | per PC, independent |
-| Self-refresh (SR) | ✅ | per stack; all 64 PCs must vote idle |
-| DVFS | ✅ | double-buffered timing, atomic swap |
-| Per-stack power gating | 🔶 | `PG_GROUP`; note that `STACK_ILV=FINE` prevents idle stacks in practice |
+| Controller clock gating | 🚧 | `hbm4_pmgr` (one per stack) raises the request, but it drives nothing |
+| DRAM power-down (PD) | 🚧 | `hbm4_pmgr` raises `pd_req`, but it drives nothing |
+| Self-refresh (SR) | 🚧 | `hbm4_pmgr` raises `sr_req`, but it drives nothing |
+| DVFS | 🚧 | not implemented: no DVFS logic and no double-buffered timing set |
+| Per-stack power gating | 🚧 | not implemented, and there is no `PG_GROUP`. Under `FINE` interleave stacks are never idle anyway |
 | Maximum Power Saving Mode | ❌ | not implemented; SR covers the deep-idle case |
 
 ### 2.5 Initialization
 
 | Feature | Status | Notes |
 |---|---|---|
-| Microcoded training sequencer | ✅ | 2 KB script RAM, ~15 instructions |
+| Microcoded training sequencer | ✅ | `hbm4_init_seq`. The script is a fixed ROM (`hbm4_seq_rom`), not a loadable 2 KB RAM |
 | Parallel training, all channels and stacks | ✅ | |
 | WCK / write-leveling / DQ training | 🔲 | algorithm is a **customer-supplied script** |
-| Read/write latency measurement | ✅ | writes `RD_FIFO_DEPTH` and CL/CWL CSRs |
-| ECC region initialisation | ✅ | `FULL` (default) or `LAZY` |
-| Degraded boot (stack disabled) | 🔶 | `DEGRADED_BOOT_EN`; requires `STACK_ILV = NUMA` |
+| Read/write latency measurement | 🚧 | not as described: there are no CSRs to write. Timing arrives on `tcfg`, `RD_FIFO_DEPTH` is an elaboration parameter, and the read FIFO absorbs the PHY's actual latency |
+| ECC region initialisation | 🚧 | not integrated: `hbm4_ecc_init` is not instantiated |
+| Degraded boot (stack disabled) | 🚧 | not implemented: one failed stack fails the whole boot (`test_one_stack_failure_fails_boot`) |
 
 ---
 
@@ -94,13 +95,22 @@ you can sign off. Written to be handed to a customer's verification lead unedite
 |---|---|---|
 | Native wide interface (NHI) | ✅ | 32 B granularity, tagged, credit-metered |
 | Out-of-order response | ✅ | by design; the host must key on the tag |
-| Same-block RAW hazard | ✅ | detect, forward, or block |
-| Write coalescing | ✅ | |
-| Per-port QoS with aging | ✅ | 4 classes, bounded starvation |
+| Same-block RAW hazard | 🚧 | detect and block (`raw_block`) for **one** queued write per block. A second queued write to the same block merges into the first one's entry and is unprotected once the first drains (OPEN-15). Forwarding is not implemented |
+| Write coalescing | 🚧 | hazard-tracking entries merge, but both writes still issue to the DRAM |
+| Per-port QoS with aging | 🚧 | `req_qos` is carried, but only the urgent class changes arbitration, and there is no aging (OPEN-11), so starvation is not bounded |
 | **Cross-port ordering** | ❌ | Pseudo-channels are independent memories. Fence in the fabric. |
 | AXI4 / ACE / CHI | ❌ | Bridge in the fabric where one bridge can serve many PCs. Bridging per-PC would cost 256 protocol engines for semantics streaming traffic does not use. |
 | Exclusive access / atomics | ❌ | out of scope; implement above the controller |
 | Address translation / IOMMU | ❌ | out of scope |
+
+> **Status (Rev 1.4): the NHI as built.** Write data travels on `req_data` with its request.
+> There is no separate write-data channel, no `WD_SKEW`, and no `req_be`, `req_poison` or
+> `req_last` ([03 §1](03-interface-spec.md)). Write data is stored per transaction, so rule H2
+> (tags unique among outstanding reads) is sufficient. **Out-of-range requests are dropped
+> without a response and their credit is never returned:** `rsp_err = 3` ("access fault") is
+> never generated. Responses are also lost under `rsp_ready` back-pressure (OPEN-16), and some
+> write acknowledgements under mixed traffic (OPEN-17). These are open items, see
+> [09 Release Notes](09-release-notes.md).
 
 ---
 
@@ -217,16 +227,50 @@ Copy into your project and fill in:
 | Gate-level timing | **Not covered by the open-source flow** | STA + `eqy` equivalence; vendor tools if available |
 
 **Superseded at Rev 1.0.** The rows above were written when no RTL existed and every entry read
-"planned." RTL now exists and much of it is verified — see the **Rev 1.0 evidence status**
-table below, which supersedes the planning language above and separates what is *measured*
-from what is merely *derived*.
+"planned." RTL now exists and much of it is verified — see the **Rev 1.4 evidence status**
+table below. It supersedes the planning language above (and the Rev 1.0 table after it), and
+separates what is *measured* from what is merely *derived*.
 
 The planning rows are kept rather than deleted: they record what was promised, which is what
 makes the evidence table checkable.
 
 ---
 
-## Rev 1.0 — evidence status
+## Rev 1.4 — evidence status
+
+Re-established for Rev 1.4: every row was re-run or re-measured on the Rev 1.4 RTL.
+
+| Claim | Evidence | Strength |
+|---|---|---|
+| JEDEC command timing honoured | independent checker in `sim/hbm4_dram_model.py`, live on every command in every suite | **measured** |
+| Bank group alternates on consecutive column commands (C2) | 4.8% same-BG consecutive pairs at production geometry (3 of 63); 0.0% at reduced geometry | **measured** |
+| Column bus can be saturated | 98.8% utilisation, production geometry, streaming reads (no ECC traffic: inline ECC is not integrated) | **measured** |
+| Write data reaches the DRAM byte-exact | `test_write_read_data`; `test_write_data_tag_independence` with colliding tags, which fails on Rev 1.3 RTL | **measured** |
+| A read never overtakes a queued write (RAW) | holds with one queued write per block (`test_raw_hazard`); **fails with two**: W, R, W observed (OPEN-15) | **FAILS** |
+| Boot configures the device | MRS + PREA + 7 PHY steps observed on the interfaces | **measured** |
+| Link uncorrectable escalates to the host | 4 injected → 4 UE, 4 responses | **measured** |
+| No state survives reset | power-on and mid-operation both tested, one slice | **measured** |
+| Lint | Verilator `-Wall`, `hbm4_sys_top`, clean at production and at reduced geometry | **measured** |
+| Timing-engine and address-path correctness | unbounded proofs, re-run at production geometry (`FV_DEFINES=`) | **proved** |
+| Block proofs | 21 blocks, 42/42 tasks pass at reduced geometry; 77/77 mutations caught. Five blocks prove modules that are not instantiated | **proved** |
+| Write data stored per transaction | `test_write_data_tag_independence`, `test_write_read_data`. The pool's index exports and the RAM alone are BMC-checked (OPEN-12); no proof covers the slice wiring (OPEN-14) | **measured** |
+| Refresh legality (never to an open bank) | `p_ref_bank_closed`, `p_rfm_bank_closed` | **proved** |
+| Address slice matches controller decode | formal miter, re-run at production geometry | **proved** |
+| SEC-DED(266,256) codec | behaviour proved at 32 bits + exhaustive H-matrix check at 256. Used by link ECC; inline ECC is not integrated | **proved (structurally)** |
+| No combinational loops | `check -assert` | **proved** |
+| 1 GHz operation | **2334 ps on ASAP7 as shipped** (~428 MHz), no wire delay | **FAILS — ~2.3× over budget** |
+| Area | **18 744 µm² per pseudo-channel** on ASAP7 (~4.8 mm² for 256); see [syn/README.md](../syn/README.md) | **measured** |
+| Power | no estimate | **NOT established** |
+| ~83% full-workload efficiency | derived from timing parameters only | **NOT measured** |
+| Multi-stack system behaviour | boot and control simulated at reduced geometry (2 stacks, 8 slices), 5/5; no data traffic; the 256-slice system only lints | **partly verified** |
+| Integration completeness | five specified modules are not instantiated: `hbm4_csr`, `hbm4_ecc_cache`, `hbm4_ecc_init`, `hbm4_err_log`, `hbm4_scrub` | **FAILS** (`tools/check_instantiation.sh`) |
+| Every request is answered exactly once | out-of-range requests are dropped (OPEN-13); completions are lost under `rsp_ready` back-pressure (OPEN-16); write acks are lost under mixed traffic, 199 of 213 in a 400-request probe at production geometry (OPEN-17). Each loss leaks a credit | **FAILS** |
+| DRAM timing values | every value marked `(P)` is a placeholder | **NOT established** |
+
+**The rows marked FAILS, NOT and partly are what stands between this and a tapeout-ready
+deliverable.**
+
+## Rev 1.0 — evidence status (superseded by the Rev 1.4 table above)
 
 Each claim below is marked with what actually backs it, so a reviewer can tell a measured
 result from a derived one.

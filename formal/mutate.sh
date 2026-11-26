@@ -203,29 +203,42 @@ mutate "wbuf: coalescing disabled (duplicate entries)" ../rtl/fe/hbm4_wbuf.sv \
   "wr_t2[i] = wr_t1[i] && (ent_tag[i] == wr_tag);" \
   "wr_t2[i] = 1'b0;" wbuf
 
-# --- write-data storage (Rev 1.3) ------------------------------------------
-# New block on the write datapath. Corruption here writes the wrong bytes to a
-# correct address, with no error anywhere.
+# --- write-data storage (Rev 1.3; indexed by pool entry since Rev 1.4) -----
+# On the write datapath. Corruption here writes the wrong bytes to a correct
+# address, with no error anywhere.
 
 mutate "wdata: read returns the wrong entry" \
   ../rtl/fe/hbm4_wdata_ram.sv \
-  "assign rd_data     = mem[rd_tag];" \
+  "assign rd_data     = mem[rd_idx];" \
   "assign rd_data     = mem[0];" wdataram
 
 mutate "wdata: written-flag never set (every write reports no data)" \
   ../rtl/fe/hbm4_wdata_ram.sv \
-  "written[wr_tag] <= 1'b1;" \
-  "written[wr_tag] <= 1'b0;" wdataram
+  "written[wr_idx] <= 1'b1;" \
+  "written[wr_idx] <= 1'b0;" wdataram
 
 mutate "wdata: issuing without data is not reported" \
   ../rtl/fe/hbm4_wdata_ram.sv \
-  "assign err_no_data = rd_valid && !written[rd_tag];" \
+  "assign err_no_data = rd_valid && !written[rd_idx];" \
   "assign err_no_data = 1'b0;" wdataram
 
-mutate "wdata: stale flag survives issue, so a reused tag inherits old data" \
+mutate "wdata: stale flag survives issue, so a reused entry inherits old data" \
   ../rtl/fe/hbm4_wdata_ram.sv \
-  "if (rd_valid && !(wr_valid && (wr_tag == rd_tag)))" \
+  "if (rd_valid && !(wr_valid && (wr_idx == rd_idx)))" \
   "if (1'b0)" wdataram
+
+# The pool's exported indices (Rev 1.4) are what the write data is stored and
+# fetched by. One that names the wrong entry hands a write another write's
+# bytes -- the Rev 1.3 tag-aliasing failure, by a different route.
+mutate "pool: issue_idx names the list tail, not the entry popped" \
+  ../rtl/core/hbm4_txn_pool.sv \
+  "assign issue_idx  = pop_idx;" \
+  "assign issue_idx  = l_tail[il];" pool
+
+mutate "pool: alloc_idx ignores the free-entry search" \
+  ../rtl/core/hbm4_txn_pool.sv \
+  "assign alloc_idx   = free_idx;" \
+  "assign alloc_idx   = '0;" pool
 
 # --- refresh engine --------------------------------------------------------
 # Reproduces a REAL bug this proof found: selecting the hammered bank before

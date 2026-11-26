@@ -19,9 +19,170 @@ hash, and the formal property set are coupled by design.
 `VERSION` (CSR `0x0004`) reports the built version. **Drivers must check it at boot**
 ([04 §2](04-programming-guide.md)).
 
+> **Not yet true of the RTL.** `hbm4_csr` is not instantiated (see Rev 1.2 below), so there is
+> no APB register block and no `VERSION` register to read. The revision is recorded only in
+> these documents until the CSR block is integrated.
+
 ---
 
-## Rev 1.3 — current
+## Rev 1.4 — current
+
+**Status: a host following the interface rules could silently corrupt its own write data.
+Fixed. `make` in `sim/` ran no tests. Fixed. The status sections of these documents described
+Rev 1.0. Corrected. Review of this release found four more defects, three of which lose data or
+responses in normal operation. They are documented below and not fixed.**
+
+### Write data followed the tag, and the tag is not unique
+
+Rev 1.3 indexed `hbm4_wdata_ram` by `req_tag`. That fails two independent ways:
+
+1. **Truncation.** At production geometry a tag is 8 bits and the RAM has `TQ_DEPTH` = 64
+   entries, so the index was cut to 6 bits and tags *t* and *t*+64 shared an entry. Even a host
+   that never reuses a tag could collide.
+2. **H2 covers reads only.** Rule H2 ([03 §1.6](03-interface-spec.md)) requires tags to be
+   unique among outstanding **reads**. The Rev 1.3 notes below justify tag indexing with "tags
+   are already required to be unique among outstanding transactions (rule H2)". That is not
+   what H2 says. Reusing one tag across outstanding writes is conforming host behaviour.
+
+Either way a later write overwrote a queued write's data. The queued write then put the later
+write's bytes at its own, correct address. There was no error and no symptom.
+
+**Why nothing caught it:**
+
+* **Formal** runs at reduced geometry, where a tag is 2 bits and the RAM has 4 entries. The tag
+  is exactly as wide as the index, so truncation cannot happen in the configuration that is
+  proved.
+* **Simulation** drives tags from a driver that keeps them small and unique, which is stricter
+  than H2, so it never produced a collision.
+* **Lint** did catch it: five `WIDTHTRUNC` warnings, one per index into the RAM, but only at
+  production geometry. `make lint GEOM=full` failed. Nobody saw it because a bare `make` lints
+  at reduced geometry and, as described below, had stopped running anything else.
+
+**The fix: index by pool entry.** `hbm4_txn_pool` now exports `alloc_idx` (the entry an
+allocation lands in) and `issue_idx` (the entry an issue pops). A pool entry is unique among
+in-flight transactions by construction. The slice carries write data down the two-cycle
+address decode alongside the tag and stores it in the cycle the pool allocates. The write then
+fetches it by the entry it pops. **The host contract does not change:** H2 stays reads-only,
+and is now sufficient.
+
+Cost: two 256-bit pipeline registers per slice (512 flops). Re-measuring the synthesis numbers
+found that the published ones predated the write path entirely. The generic-mapping numbers
+were taken at Rev 1.0 and the ASAP7 ones at Rev 1.1, both before the write buffer was wired in
+(Rev 1.2) and before write-data storage existed (Rev 1.3). As shipped, a slice is now 30 412
+flops and 18 744 µm² on ASAP7 (it was ~7 000 µm²), and the critical path is 2334 ps (it was
+2252 ps). See [syn/README.md](../syn/README.md).
+
+**New verification:**
+
+* `test_write_data_tag_independence` drives both collision patterns, with the boot gate held
+  closed while sending so that every write is provably outstanding at once. Against Rev 1.3
+  RTL it fails: **3 of 4** blocks hold another write's data at reduced geometry, and **19 of 36**
+  at production geometry. It passes on Rev 1.4.
+* Pool assertions `a_alloc_idx_free`, `a_issue_idx_live`, `a_issue_idx_addr` and
+  `a_issue_idx_tag`, checked by the pool proof.
+* Two mutations: `issue_idx` naming the list tail, and `alloc_idx` ignoring the free-entry
+  search. Both are caught. The harness is now **77 mutations**.
+* `fv_wdata_ram` is re-targeted to the index ports. Its properties are unchanged.
+* The timing-engine and address-map proofs were re-run at **production geometry**
+  (`FV_DEFINES=`). Both pass unbounded.
+
+### `make` in `sim/` ran no tests
+
+The Rev 1.3 strict-lint target was placed above the cocotb include, so `lint` became make's
+default goal. From then on a bare `make`, which is what [sim/README.md](../sim/README.md) says
+to run, linted at reduced geometry, reported success, and ran **zero tests**. The default goal
+is now pinned to cocotb's `all`, and `sim` depends on `lint`, so the gate runs first and cannot
+be skipped by accident.
+
+### The status sections described Rev 1.0
+
+Every document header said Rev 1.3, while the status sections in the README, 01, 06 and 08 still
+carried Rev 1.0 claims. These are now corrected:
+
+| Claim | Actual (Rev 1.4) |
+|---|---|
+| lint-clean at `-Wall` | it was not, at production geometry (above); it is now |
+| 32 modules | 31 modules and 2 packages |
+| 20 blocks, 40/40 proof tasks | 21 blocks, 42/42 |
+| 70, 71 or 72 mutations (varied by document) | 77 |
+| full-system simulation: "none" (README, 01) / "the 256-slice system, 5/5" (06) | `hbm4_sys_top` is simulated at **reduced geometry**: 2 stacks, 8 slices, boot and control only, 5/5. The 256-slice system elaborates and lints but has never been simulated |
+| slice simulation 10/10 | 12/12 at production geometry |
+| `hbm4_wdata_ram` has no formal proof (Rev 1.3 notes) | a BMC proof exists (OPEN-12 explains why it is not unbounded) |
+| C2 holds on every consecutive pair: 0.0% same-bank-group (07, 08) | **4.8%** (3 of 63) at production geometry. The 0.0% figure is the reduced-geometry result |
+| ASAP7: 2252 ps, ~7 000 µm² per slice | measured before the write buffer and the write-data RAM existed. Rev 1.4 as shipped: **2334 ps, 18 744 µm²** |
+| test_boot covers a stack of 64 slices (06) | at reduced geometry a stack is 4 slices |
+
+Features that are specified but **not integrated** were described as present: the APB
+register map (02, 04), inline system ECC "on by default" (README, 02, 08, A), patrol scrub,
+ECC initialisation and the error log. Each now carries a status note. The specifications are
+kept, because they describe the intended design. [03 §1](03-interface-spec.md) also now says
+what the RTL actually implements: write data arrives on `req_data` with its request. There is
+no separate `wd_*` channel, no `WD_SKEW`, and no `req_be`, `req_poison` or `req_last`.
+
+Checking every claim against the RTL found more absent features than the five unconnected
+modules. None of these exists in the RTL:
+
+* issuing all-bank refresh, temperature-based refresh, auto-precharge (`CLOSE`), and the
+  address-map and stack-interleave modes;
+* link-ECC generation on writes, and link-ECC retry;
+* on-die ECC polling, `ALERT_n`, PPR and lane repair;
+* power-down, self-refresh and clock gating (`hbm4_pmgr`'s requests drive nothing), DVFS;
+* QoS aging, write coalescing at the DRAM, read forwarding, degraded boot;
+* the `APB`, `clk_cfg` and `warm_rst_n` interfaces.
+
+[08](08-compliance-matrix.md) now marks each 🚧, a status it gains in this release, with a
+Rev 1.4 evidence table. The other documents carry **Status (Rev 1.4)** notes. Two further
+corrections: [02 §6.2](02-architecture.md) said credits return per freed pool entry, but they
+return per accepted response. And in `formal/ASSUMPTIONS.md`, two collapsed `<details>` blocks hid live open items: OPEN-11
+and OPEN-12 sat inside the block for the *original* OPEN-1, and OPEN-7, OPEN-6 and OPEN-4 inside
+an unclosed block for the original OPEN-9. Both are fixed. The audit also now lists A8–A10,
+which `fv_nhi_target` has always assumed and the audit never recorded. **A10 is violated by the
+design** (OPEN-16).
+
+### Found during this release, still open
+
+Each defect below was confirmed by a simulation probe. None was caused by Rev 1.4. They are
+listed in [formal/ASSUMPTIONS.md](../formal/ASSUMPTIONS.md).
+
+* **A second queued write to the same block loses read-after-write protection** (OPEN-15).
+  `hbm4_wbuf` merges it into the first write's hazard entry, and the first write's issue clears
+  that entry. A read can then overtake the second write and return the first write's data:
+  `W1(X), W2(X), R(X)` produced the column order **W, R, W** at both geometries. This is the
+  Rev 1.2 RAW failure, back for the two-write case, and it breaks ordering guarantee G1.
+* **`rsp_ready` back-pressure loses responses** (OPEN-16). The slice offers completions without
+  consulting `cmpl_ready`. A 300-cycle stall during a burst of reads left **2 of 4** responses
+  accepted at reduced geometry and **17 of 64** at production geometry. Every test holds
+  `rsp_ready` high, so nothing had exercised it.
+* **Write acknowledgements are lost under mixed traffic** (OPEN-17). A single deferred-ack
+  register overflows when a write issues while a read completes. With `rsp_ready` held high,
+  400 random requests at production geometry got **199 of 213** write acks. Every lost ack leaks
+  a credit, so a busy port eventually stalls.
+* **The `SYSECC_EN = 0` decode path is misaligned** (OPEN-18). Row and column lag bank and valid
+  by one request. That build has never been run.
+* **Out-of-range requests are dropped without a response** (OPEN-13). A request whose block address
+  decodes beyond capacity (`dec_oor`) is neither allocated nor completed. The NHI counted it as
+  outstanding, so its credit never returns and its tag never answers. After `TQ_DEPTH` such
+  requests the port has no credits left. [03 §1.4](03-interface-spec.md) defines
+  `rsp_err = 3` ("access fault"), but nothing generates it. Reachable only through a host
+  addressing error, but the consequence is a hang rather than an error.
+* **No formal proof covers seven modules** (OPEN-14): `hbm4_dir_fsm`, `hbm4_dfi_adapter`,
+  `hbm4_seq_rom`, `hbm4_supervisor`, `hbm4_pc_slice`, `hbm4_stack_top` and `hbm4_sys_top`.
+  The assertions written inside two of them, `a_burst_bounded` and `a_pool_has_room`, are
+  checked by nothing, and P-DIR-1 / P-DIR-2 are unimplemented.
+* **`wdataram.sby` has no `prove` task**, so even the inductive write-data properties are
+  bounded (OPEN-12, corrected).
+* **`make -C syn` counts loops in a stale log.** Its recipe greps `synth.log`, which the target
+  never writes, so it reports on whatever log was left behind. `make -C syn check` is the
+  authoritative loop test, and it passes.
+* **Link-ECC retry (OPEN-9), when it is built, must carry the pool entry.** The slice currently
+  feeds `tqidx_t'(rd_tag)` to `hbm4_link_ecc` as the replay index. That is the same truncation
+  as this release's bug. It is harmless only because retry is disabled. Use `issue_idx`.
+* Unchanged from Rev 1.3: five modules unconnected, 1 GHz not closed, every DRAM timing value a
+  placeholder, burst length unconfirmed.
+
+---
+
+## Rev 1.3
 
 **Status: the controller could not write data. It can now.**
 

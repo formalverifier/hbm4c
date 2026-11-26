@@ -1,6 +1,15 @@
 # 02 — Architecture and Micro-Architecture
 
-**HBM4 Memory Controller · Rev 1.3**
+**HBM4 Memory Controller · Rev 1.4**
+
+> **Status (Rev 1.4).** This document describes the intended architecture. Five of its modules
+> are not instantiated in the RTL: `hbm4_csr` (the APB register block, with `AMAP_LOCK`),
+> `hbm4_ecc_cache` (inline system ECC), `hbm4_ecc_init`, `hbm4_err_log` and `hbm4_scrub`. So
+> there is no register map, no inline ECC on stored data, no ECC initialisation, no error log
+> and no patrol scrub. Configuration that this document calls CSRs arrives, where it exists at
+> all, on input ports of `hbm4_sys_top` (`tcfg`, `lcfg`, `cfg_*`, `irq_mask`). Sections whose
+> features are absent or differ in the RTL carry a **Status (Rev 1.4)** note. See
+> [09 Release Notes](09-release-notes.md).
 
 ---
 
@@ -197,6 +206,10 @@ pseudo-channel gets its own port, placed physically next to its PHY slice.
 **The supervisor is thin.** It handles boot, the CSR aperture, cross-stack RAS, DVFS, and
 refresh phase. It is never in the data path.
 
+> **Status (Rev 1.4):** `hbm4_supervisor` implements boot orchestration, interrupt aggregation
+> and the performance-snapshot edge. There is no CSR aperture (`hbm4_csr` is not integrated)
+> and no DVFS logic, and refresh phases are assigned per stack in `hbm4_stack_top`.
+
 ![Figure 2 — RTL hierarchy](figures/fig-02-rtl-hierarchy.drawio.svg)
 
 ---
@@ -225,6 +238,11 @@ The NHI is **synchronous to `clk_core`**. Two consequences:
 
 Reset: `rst_n` (cold; async assert, sync deassert per domain) and `warm_rst_n` (retains CSR
 and trained PHY state; used for DVFS and error recovery).
+
+> **Status (Rev 1.4):** the RTL has one clock (`clk`) and one reset (`rst_n`). There is no
+> `clk_cfg` domain, because there is no APB block to put in it, and no `warm_rst_n`. The init
+> sequencer, supervisor and RAS logic run on the core clock, so the only clock crossing is the
+> PHY boundary.
 
 ---
 
@@ -286,12 +304,19 @@ state machine, and no `ready` on the request channel.
 ### 6.2 The three rules a host must obey
 
 1. **Send only while you hold a credit.** Credits start at `TQ_DEPTH` and return one per
-   freed pool entry. A credit *is* the permission to send; there is no ready handshake.
+   response the host accepts. A credit *is* the permission to send; there is no ready handshake.
    ([Timing 4](waves/wave-04-nhi-credit.svg))
 2. **Key on the tag, never on arrival order.** Responses come back out of order.
    ([Timing 2](waves/wave-02-nhi-out-of-order.svg))
 3. **Do not stall `rsp_ready` for long.** Back-pressure here propagates all the way to the
    DRAM bus. Exceeding `RSP_STALL_MAX` raises an interrupt.
+
+> **Status (Rev 1.4):** write data travels with its request on `req_data`.
+> [03 §1](03-interface-spec.md) says exactly what the RTL implements. Write data is stored per
+> transaction (by pool entry), so tags need to be unique only among outstanding reads (rule H2).
+> **Rule 3 is stricter in the RTL than written:** back-pressure does not propagate. Any
+> `rsp_ready` stall that coincides with a completion loses it, so do not stall at all (OPEN-16 in
+> [formal/ASSUMPTIONS.md](../formal/ASSUMPTIONS.md)).
 
 ![Timing 2 — out of order responses](waves/wave-02-nhi-out-of-order.svg)
 
@@ -422,6 +447,10 @@ currently streaming, so its ACT hides behind column traffic. Target ≥96% row h
 | `CLOSE` | auto-precharge every access | genuinely random access; frees the row bus |
 | `NUMA` | STACK at the top, contiguous per-stack regions | software placement; heterogeneous or degraded stacks (§13.4) |
 | `RAW` | fully CSR-programmable | bring-up and silicon debug |
+
+> **Status (Rev 1.4):** only `STREAM` is implemented. The RTL has no mode field:
+> `hbm4_addr_slice` and `hbm4_addr_decode` take hash masks only (`slice_cfg_t`, `local_cfg_t`),
+> and no column command auto-precharges. `LOCAL`, `CLOSE`, `NUMA` and `RAW` do not exist.
 
 ---
 
@@ -579,6 +608,14 @@ The buffer also does two things that pay for the structure:
 - **Forwarding** — an exact hit with full byte coverage returns the buffered data directly.
   The read never touches DRAM at all.
 
+> **Status (Rev 1.4):** `hbm4_wbuf` tracks hazards only and holds no data. Write data lives in
+> `hbm4_wdata_ram`, one 32 B entry per transaction-pool entry. Forwarding is not implemented:
+> a read that hits a pending write is held back (`raw_block`) until the write drains.
+> **Coalescing breaks that protection for a second write to the same block.** The second write
+> merges into the first one's entry, and the first write's issue clears it, so a read can then
+> overtake the second write and return the first write's data (OPEN-15, confirmed in
+> simulation). Both writes still issue to the DRAM.
+
 ### 8.6 The two arbiters
 
 ![Figure 7 — dual arbiter](figures/fig-07-scheduler.drawio.svg)
@@ -693,6 +730,13 @@ Generated per burst on writes, checked per burst on reads.
 succeeds and the host never sees it. Bounded at 3 attempts, then escalated. Crossing
 `LECC_THRESH` raises an interrupt and triggers a link retrain (§14.4).
 
+> **Status (Rev 1.4):** only the read-side check is built (`hbm4_link_ecc` on the return
+> path). No link-ECC code is generated for writes, because the DFI has no write-code output.
+> Retry is disabled (OPEN-9), so a link uncorrectable returns `rsp_err = 2`. The threshold
+> output is not connected above the slice (`hbm4_stack_top` drops it), so no interrupt exists.
+> With the threshold tied to `0xFFFF` it asserts once 65 535 corrected beats accumulate. There
+> is no retrain path.
+
 ### 10.2 On-die ECC — protects the DRAM array
 
 The DRAM corrects single-bit array faults internally and invisibly. You cannot see
@@ -700,7 +744,15 @@ corrections directly, but a rising on-die correction rate is the leading indicat
 die — so the sequencer polls the on-die ECC status mode registers every 100 ms and
 accumulates per-channel counters. `ALERT_n` is captured and timestamped.
 
+> **Status (Rev 1.4):** not implemented. There is no on-die ECC status polling and no
+> `ALERT_n` input.
+
 ### 10.3 Inline system ECC — protects end to end (**on by default**)
+
+> **Status (Rev 1.4): not integrated.** `hbm4_ecc_cache` is not instantiated, so nothing
+> encodes or checks stored data. The address map still reserves 2 of 32 columns (`div30`),
+> which is 6.25% of capacity, and no ECC column accesses are issued. The rest of this section is
+> the specification. See [09 Release Notes](09-release-notes.md).
 
 ![Figure 9 — ECC layout](figures/fig-09-ecc-layout.drawio.svg)
 
@@ -765,6 +817,9 @@ wrong answer.
 `RMW_COALESCE_WIN` (128 clocks) holds partial writes briefly to let neighbours merge. Deep
 write buffers help here too — another reason `WBUF_DEPTH=128` earns its area.
 
+> **Status (Rev 1.4):** not implemented. The NHI as built has no `req_be`, so every write is a
+> full 32 B block, and there is no read-modify-write and no `RMW_COALESCE_WIN`.
+
 ### 10.5 Poison and scrub
 
 Poison uses a reserved non-codeword in the check field, so it **requires** `SYSECC_EN`
@@ -778,6 +833,10 @@ correcting and rewriting correctable errors — a full 960 MB per-PC sweep every
 Error log: 16 entries per stack plus a separate sticky first-error latch, so the first fault
 survives a storm. The supervisor merges per-stack logs into one globally timestamped view,
 so a correlated multi-stack event (power, thermal) appears as one event, not four.
+
+> **Status (Rev 1.4): not integrated.** Poison needs inline ECC (`hbm4_ecc_cache`), patrol
+> scrub is `hbm4_scrub`, and the error log is `hbm4_err_log`. None of them is instantiated. The
+> supervisor aggregates per-stack error flags into an interrupt, but nothing is logged.
 
 ---
 
@@ -810,6 +869,11 @@ so a correlated multi-stack event (power, thermal) appears as one event, not fou
 >    traffic runs — per-stack self-refresh never engages. Right for a bandwidth-first
 >    accelerator; wrong for a system needing fault isolation or aggressive idle power.
 
+> **Status (Rev 1.4):** one `tcfg` input configures every stack, so stacks cannot be timed
+> differently. There is no RAS log (`hbm4_err_log` is not integrated) and no DVFS. `STACK_ILV`
+> does not exist: `hbm4_addr_slice` implements the fixed `FINE` order (stack bits directly
+> above the 32 B offset), and `MEDIUM` and `NUMA` are not built.
+
 ---
 
 ## 12. DFI and power
@@ -831,6 +895,11 @@ FIFO depth must exceed the round trip, and the real value is measured during tra
 DVFS: enter SR → change PHY frequency → retrain → swap the **double-buffered** timing CSR set
 → exit SR. The double buffering exists so the swap is atomic; a torn timing update is
 indistinguishable from a scheduler bug and would be near-impossible to debug in silicon.
+
+> **Status (Rev 1.4):** the read-pointer FIFO carries the transaction's tag, not its pool
+> index (`col_tag` in `hbm4_dfi_adapter`). `hbm4_pmgr` tracks idle time, but its clock-gate,
+> power-down and self-refresh requests drive nothing. There is no DVFS and no double-buffered
+> timing set.
 
 ---
 
@@ -857,6 +926,11 @@ concurrently.
 > exists for boot-time-sensitive systems but adds a bitmap lookup on the write path and a
 > genuinely more complex failure surface. `FULL` is the default and the recommendation.
 
+> **Status (Rev 1.4):** the script is a fixed ROM (`hbm4_seq_rom`), not a RAM loaded over APB,
+> and lane repair is not implemented. ECC region init (`hbm4_ecc_init`) is not integrated.
+> Inline ECC is absent too, so nothing reads the ECC columns and the spurious-error hazard above
+> cannot occur yet. It returns the moment inline ECC is connected without `hbm4_ecc_init`.
+
 ---
 
 ## 14. Performance
@@ -875,6 +949,11 @@ concurrently.
 
 **= 6.88 TB/s of 8.19 TB/s.** Target set at 83.0% (6.80 TB/s) for margin. With
 `SYSECC_EN = 0`: 90.2% = 7.38 TB/s — the ECC decision, made visible.
+
+> **Status (Rev 1.4):** this is an analytic budget for the specified design. Inline ECC is not
+> integrated, so the RTL issues no ECC column accesses. The slice simulation measures 98.8%
+> column-bus utilisation on streaming reads at production geometry, with no writes and no ECC,
+> so that number is not comparable with this 2:1 budget.
 
 ### 14.2 Latency budget (idle, read, row hit, ECC cache hit)
 
@@ -909,6 +988,10 @@ SRAM/flop dominated. The two big knobs are `WBUF_DEPTH` (linear area vs turnarou
 
 **These are analytic numbers.** Before trusting them, cross-check against an independent
 model — see [06-verification-plan.md §6.4](06-verification-plan.md).
+
+> **Status (Rev 1.4):** as built, the write buffer holds hazard tags and no data. Write data is
+> in `hbm4_wdata_ram` (64 × 32 B = 2 KB of flops per pseudo-channel), and there is no ECC column
+> cache. Synthesized numbers are in [syn/README.md](../syn/README.md).
 
 ---
 

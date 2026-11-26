@@ -1,10 +1,61 @@
 # Synthesis — area and timing-plausibility evidence
 
-**Rev 1.0** · Yosys 0.68, generic `abc -g simple` mapping · `make -C syn`
+**Rev 1.4** · Yosys 0.68, sv2v 0.0.13 · generic `abc -g simple` mapping and ASAP7 ·
+`make -C syn`, `yosys sta.ys`
 
 Until this existed the design had been through Verilator lint and forty formal proofs and
 **had never been synthesized**. The entire architecture is justified by a 1 ns core clock
 (docs/02 §3); that number was an assumption with nothing behind it.
+
+## Rev 1.4 re-measurement — read this first
+
+The numbers further down were measured at Rev 1.0 (generic mapping) and Rev 1.1 (ASAP7), on a
+slice that had **no write buffer wired in (that came in Rev 1.2) and no write-data storage at
+all (Rev 1.3)**. They described a
+design that could not write data. Everything in this section was re-run on the Rev 1.4 RTL
+(production geometry, `TQ_DEPTH` = 64, `WBUF_DEPTH` = 128) and supersedes them.
+
+| Metric | before the write path | **Rev 1.4** |
+|---|---:|---:|
+| Flops per pseudo-channel | 8 652 | **30 412** |
+| Cells, flattened generic mapping | 90 240 | **214 333** |
+| Longest path, 2-input gate levels | 125 | **212** |
+| ASAP7 critical path, as shipped | 2252 ps | **2334 ps** (~428 MHz) |
+| ASAP7 area per pseudo-channel | ~7 000 µm² | **18 744 µm²**, 47% of it flops |
+| × 256 pseudo-channels | ~1.8 mm² | **~4.8 mm²** |
+
+**Where the area went.** Generic mapping, unflattened, per block (`rpt/area_by_module.txt`):
+
+| Block | Cells | Share |
+|---|---:|---:|
+| `hbm4_wbuf` (write buffer, RAW hazard) | 67 216 | **33.9%** |
+| `hbm4_wdata_ram` (write data, 64 × 32 B) | 48 733 | **24.6%** |
+| `hbm4_txn_pool` | 32 351 | 16.3% |
+| `hbm4_timing_engine` | 20 732 | 10.5% |
+| `hbm4_refresh` | 8 379 | 4.2% |
+| slice top-level glue | 7 955 | 4.0% |
+| `hbm4_row_arb` | 3 518 | 1.8% |
+| `hbm4_sys_ecc` (the link-ECC codec) | 2 761 | 1.4% |
+| everything else | 6 474 | 3.3% |
+| **total** | **198 119** | |
+
+Rev 1.4's own contribution is the 512-flop write-data pipeline in the slice glue. The RAM
+itself arrived in Rev 1.3.
+
+**The two biggest blocks are now the write path.** `WBUF_DEPTH` sizes the write buffer, and
+`TQ_DEPTH` sizes both the pool and the write-data RAM. So the Rev 1.0 finding below that
+`TQ_DEPTH` is the dominant area knob now shares the stage with `WBUF_DEPTH`. Neither has been
+sized against the workload.
+
+**The critical path moved.** The longest generic path now runs from `u_pool.l_cnt` (the
+per-list counts) through the column arbiter into `u_wbuf.ent_valid`, the write buffer's drain
+and hazard logic. It is a cross-module path that appeared when the write buffer was wired in.
+On ASAP7 the delay rose from 2252 to 2334 ps, so **1 GHz still fails, by ~2.3×**.
+
+**Not re-run:** the `TQ_DEPTH` sweep (8 / 16 / 32 / 64) further down. Its relative findings,
+that the pool's own path is flat in depth and that depth buys area more than timing, were
+measured without the write buffer and the write-data RAM, and that RAM also scales with
+`TQ_DEPTH`. Treat its absolute numbers as describing the slice before the write path only.
 
 ## What this flow can and cannot tell you
 
@@ -24,7 +75,7 @@ for the same logic.
 Comparing the two directly is a units error. It was made once while producing this report, and
 it flipped the conclusion from "comfortable" to "will not close" and back again.
 
-## Results
+## Results (Rev 1.0, superseded above)
 
 ```
 Longest register-to-register path:  125 levels of 2-input gates
@@ -41,7 +92,7 @@ feeding the timing engine's readiness vectors across all 32 banks. If timing clo
 that is where to pipeline first — most cheaply by registering `refresh_block` one cycle before
 it reaches the timing engine, which costs a cycle of refresh-blocking latency and nothing else.
 
-### Area per pseudo-channel
+### Area per pseudo-channel (Rev 1.0, before the write path existed)
 
 | Block | Cells | Share |
 |---|---:|---:|
@@ -56,7 +107,7 @@ it reaches the timing engine, which costs a cycle of refresh-blocking latency an
 
 **× 256 pseudo-channels ≈ 20.6 M 2-input-gate equivalents** for the controller alone.
 
-### The actionable finding
+### The actionable finding (Rev 1.0)
 
 **Two blocks are two thirds of the design.** `TQ_DEPTH` is the dominant area knob: at 64
 entries per pseudo-channel the system carries **16 384 in-flight transactions**, which is
@@ -89,6 +140,9 @@ The generic `abc -g simple` results above are superseded. This section uses **AS
 merged into one liberty for `abc -liberty`.
 
 ## Headline: the design does not close at 1 GHz
+
+> **Rev 1.4:** as shipped, the critical path is now **2334 ps** (see the top of this file). The
+> table below is the Rev 1.1 measurement, without the write buffer or the write-data RAM.
 
 | Metric | Value |
 |---|---|
@@ -136,7 +190,7 @@ PI-to-PO paths that are constrained or unused in context. **Treat 3867 ps as unr
 rather than as evidence the pool is the bottleneck.
 
 **2. Shrinking `TQ_DEPTH` does not fix timing.** The prediction above -- that the pool's
-64-entry search drives the critical path -- is wrong. Measured:
+64-entry search drives the critical path -- is wrong. Measured at Rev 1.1:
 
 | `TQ_DEPTH` | slice (ps) | pool standalone (ps) | slice area (um2) |
 |---:|---:|---:|---:|

@@ -1,22 +1,24 @@
-Warning: Replacing memory \open_row_q with list of registers. See build/slice.v:706
-Warning: Replacing memory \st_q with list of registers. See build/slice.v:705
-Warning: Replacing memory \raa with list of registers. See build/slice.v:1013
-Warning: Replacing memory \rfc_cnt with list of registers. See build/slice.v:1012
-Warning: Replacing memory \t_faw with list of registers. See build/slice.v:1413
-Warning: Replacing memory \t_wtrl with list of registers. See build/slice.v:1407
-Warning: Replacing memory \t_rrdl with list of registers. See build/slice.v:1406
-Warning: Replacing memory \t_ccdl with list of registers. See build/slice.v:1405
-Warning: Replacing memory \t_pre with list of registers. See build/slice.v:1398
-Warning: Replacing memory \t_col with list of registers. See build/slice.v:1397
-Warning: Replacing memory \t_act with list of registers. See build/slice.v:1396
-Warning: Replacing memory \n_faw with list of registers. See build/slice.v:1375
-Warning: Replacing memory \n_wtrl with list of registers. See build/slice.v:1365
-Warning: Replacing memory \n_rrdl with list of registers. See build/slice.v:1364
-Warning: Replacing memory \n_ccdl with list of registers. See build/slice.v:1363
-Warning: Replacing memory \n_pre with list of registers. See build/slice.v:1356
-Warning: Replacing memory \n_col with list of registers. See build/slice.v:1355
-Warning: Replacing memory \n_act with list of registers. See build/slice.v:1354
-Warning: Replacing memory \l_tail with list of registers. See build/slice.v:1628, build/slice.v:1598
-Warning: Replacing memory \dw_qos with list of registers. See build/slice.v:3347
-Warning: Replacing memory \dw_tag with list of registers. See build/slice.v:3346
-Warning: Replacing memory \dw_wr with list of registers. See build/slice.v:3345
+Warning: Replacing memory \open_row_q with list of registers. See build/slice.v:751
+Warning: Replacing memory \st_q with list of registers. See build/slice.v:750
+Warning: Replacing memory \raa with list of registers. See build/slice.v:1058
+Warning: Replacing memory \rfc_cnt with list of registers. See build/slice.v:1057
+Warning: Replacing memory \t_faw with list of registers. See build/slice.v:1458
+Warning: Replacing memory \t_wtrl with list of registers. See build/slice.v:1452
+Warning: Replacing memory \t_rrdl with list of registers. See build/slice.v:1451
+Warning: Replacing memory \t_ccdl with list of registers. See build/slice.v:1450
+Warning: Replacing memory \t_pre with list of registers. See build/slice.v:1443
+Warning: Replacing memory \t_col with list of registers. See build/slice.v:1442
+Warning: Replacing memory \t_act with list of registers. See build/slice.v:1441
+Warning: Replacing memory \n_faw with list of registers. See build/slice.v:1420
+Warning: Replacing memory \n_wtrl with list of registers. See build/slice.v:1410
+Warning: Replacing memory \n_rrdl with list of registers. See build/slice.v:1409
+Warning: Replacing memory \n_ccdl with list of registers. See build/slice.v:1408
+Warning: Replacing memory \n_pre with list of registers. See build/slice.v:1401
+Warning: Replacing memory \n_col with list of registers. See build/slice.v:1400
+Warning: Replacing memory \n_act with list of registers. See build/slice.v:1399
+Warning: Replacing memory \l_tail with list of registers. See build/slice.v:1679, build/slice.v:1649
+Warning: Replacing memory \dw_data with list of registers. See build/slice.v:3423
+Warning: Replacing memory \dw_qos with list of registers. See build/slice.v:3415
+Warning: Replacing memory \dw_tag with list of registers. See build/slice.v:3414
+Warning: Replacing memory \dw_wr with list of registers. See build/slice.v:3413
+Warnings: 23 unique messages, 23 total

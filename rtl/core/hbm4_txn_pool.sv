@@ -37,6 +37,12 @@ module hbm4_txn_pool
   input  tag_t              alloc_tag,
   input  qos_t              alloc_qos,
   output logic              alloc_ready,      // a free entry exists
+  // The entry an allocation this cycle lands in, and the entry an issue this
+  // cycle pops.  Exported so per-transaction storage outside the pool (the
+  // write data, hbm4_wdata_ram) can key on the ONE identifier that is unique
+  // among in-flight transactions by construction.  The host's tag is not: it
+  // is wider than the pool and only required unique among reads (docs/03 H2).
+  output tqidx_t            alloc_idx,
 
   // ---- candidate status (to the two arbiters) ------------------------------
   output logic [N_BANK-1:0] pend_rd,
@@ -51,6 +57,7 @@ module hbm4_txn_pool
   input  dir_e              issue_dir,
   output pc_addr_t          issue_addr,
   output tag_t              issue_tag,
+  output tqidx_t            issue_idx,
 
   output logic [TQ_IDX_W:0] occupancy,
   // Sum of all per-list counts.  Exposed as a perf/debug counter (see
@@ -99,6 +106,7 @@ module hbm4_txn_pool
   assign free_mask   = ~ent_valid;
   assign free_onehot = free_mask & (~free_mask + {{(TQ_DEPTH-1){1'b0}}, 1'b1});
   assign alloc_ready = |free_mask;
+  assign alloc_idx   = free_idx;
 
   always_comb begin
     free_idx = '0;
@@ -126,6 +134,7 @@ module hbm4_txn_pool
 
   assign issue_addr = h_addr[il];
   assign issue_tag  = h_tag [il];
+  assign issue_idx  = pop_idx;
 
   // ---- sequential ----------------------------------------------------------
   always_ff @(posedge clk) begin
@@ -206,6 +215,20 @@ module hbm4_txn_pool
   always_ff @(posedge clk)
     if (rst_n && do_issue)
       a_issue_nonempty: assert (l_cnt[il] != '0);
+
+  // The exported indices name the right entries.  Write data is stored and
+  // fetched by these, so an index that drifts from the entry actually
+  // allocated or popped hands one write another write's bytes.
+  always_ff @(posedge clk)
+    if (rst_n && alloc_ready)
+      a_alloc_idx_free: assert (!ent_valid[alloc_idx]);
+
+  always_ff @(posedge clk)
+    if (rst_n && do_issue) begin
+      a_issue_idx_live: assert (ent_valid[issue_idx]);
+      a_issue_idx_addr: assert (ent_addr[issue_idx] == issue_addr);
+      a_issue_idx_tag : assert (ent_tag [issue_idx] == issue_tag);
+    end
 `endif
 
 endmodule

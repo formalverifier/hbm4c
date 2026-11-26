@@ -3,7 +3,9 @@
 //
 // This is the block replicated 256 times.  Everything in it is private to one
 // pseudo-channel: its own queue, its own bank state, its own command buses.
-// Nothing is shared between slices except the CSR bus and refresh phase.
+// Nothing is shared between slices except configuration and refresh phase.
+// (There is no CSR bus: hbm4_csr is not instantiated; configuration arrives
+// on the cfg_* ports.)
 //
 // The ROW-HIT LOGIC lives here rather than in any leaf block, because it is the
 // one decision that needs the pool and the bank state TOGETHER:
@@ -150,7 +152,19 @@ module hbm4_pc_slice
     dw_wr[1] <= dw_wr[0]; dw_tag[1] <= dw_tag[0]; dw_qos[1] <= dw_qos[0];
   end
 
+  // Write data rides the same two stages, because it is stored by POOL ENTRY
+  // (see hbm4_wdata_ram) and the entry is not known until the pool allocates.
+  // Stage 0 loads only on an accepted write, so a read in between cannot
+  // displace it; stage 1 copies unconditionally and is read only when stage 1
+  // holds a write.
+  logic [AG_BYTES*8-1:0] dw_data [2];
+  always_ff @(posedge clk) begin
+    if (core_valid && core_wr) dw_data[0] <= req_data;
+    dw_data[1] <= dw_data[0];
+  end
+
   logic              pool_alloc_ready;
+  tqidx_t            pool_alloc_idx, issue_idx;
   logic [N_BANK-1:0] pend_rd, pend_wr, pend_urgent;
   row_t              head_row  [N_BANK];
   row_t              head_wrow [N_BANK];
@@ -167,11 +181,11 @@ module hbm4_pc_slice
     .alloc_valid (dec_valid && !dec_oor), .alloc_wr (dw_wr[1]),
     .alloc_addr (dec_addr), .alloc_bank (dec_bank),
     .alloc_tag (dw_tag[1]), .alloc_qos (dw_qos[1]),
-    .alloc_ready (pool_alloc_ready),
+    .alloc_ready (pool_alloc_ready), .alloc_idx (pool_alloc_idx),
     .pend_rd (pend_rd), .pend_wr (pend_wr), .pend_urgent (pend_urgent),
     .head_row (head_row), .head_wrow (head_wrow),
     .issue_valid (col_fire && !raw_block), .issue_bank (col_bank), .issue_dir (dir),
-    .issue_addr (issue_addr), .issue_tag (issue_tag),
+    .issue_addr (issue_addr), .issue_tag (issue_tag), .issue_idx (issue_idx),
     .occupancy (pool_occ), .occ_lists (pool_occ_lists)
   );
 
@@ -283,21 +297,6 @@ module hbm4_pc_slice
   // is re-granted later and by then the blocking write is gone. Blocking without
   // forcing the drain would livelock: the arbiter would re-grant the same read
   // forever while the write it waits on never issues.
-  // Write data is held from request until the column write issues.  Indexed by
-  // TAG, which the interface spec already requires to be unique among
-  // outstanding transactions -- so this needs no change to the transaction pool.
-  logic [AG_BYTES*8-1:0] wdata_out;
-  logic                  err_wdata;
-  logic [TQ_DEPTH-1:0]   wdata_dbg;
-
-  hbm4_wdata_ram u_wdata (
-    .clk (clk), .rst_n (rst_n),
-    .wr_valid (req_valid && req_wr), .wr_tag (req_tag), .wr_data (req_data),
-    .rd_valid (col_fire && !raw_block && (dir == DIR_WRITE)),
-    .rd_tag (issue_tag), .rd_data (wdata_out),
-    .err_no_data (err_wdata), .dbg_written (wdata_dbg)
-  );
-
   logic raw_hazard, raw_forward, raw_block;
   logic wbuf_ready, wbuf_coalesced;
   logic [WBUF_DEPTH-1:0]                 wb_dbg_valid, wb_dbg_be_full;
@@ -337,6 +336,37 @@ module hbm4_pc_slice
   // Suppress only READS. A write cycle's query is a drain lookup, and its
   // rd_hazard result is meaningless -- a write always matches itself.
   assign raw_block = col_fire && (dir == DIR_READ) && raw_hazard;
+
+  // =========================================================================
+  // WRITE DATA -- hbm4_wdata_ram, keyed by POOL ENTRY
+  //
+  // Stored in the cycle the pool allocates the write, at the entry it
+  // allocates; fetched in the cycle the write issues, from the entry it pops.
+  // The pool entry is unique among in-flight transactions by construction.
+  //
+  // Rev 1.3 keyed this by the host's tag and stored at request time.  The tag
+  // is 8 bits against a 64-entry RAM, so tags t and t+64 shared an entry, and
+  // docs/03 H2 lets a host reuse a tag across outstanding writes -- either way
+  // a queued write's data was overwritten, silently.
+  //
+  // `pool_alloc_ready` gates the store: if the pool ever had no room, alloc_idx
+  // would name a LIVE entry and the store would corrupt another write's data.
+  // NHI credit accounting should make that impossible, and a_pool_has_room
+  // below says so -- but no formal proof covers this module, so that assertion
+  // is never checked. The gate is what actually guarantees it.
+  // =========================================================================
+  logic [AG_BYTES*8-1:0] wdata_out;
+  logic                  err_wdata;
+  logic [TQ_DEPTH-1:0]   wdata_dbg;
+
+  hbm4_wdata_ram u_wdata (
+    .clk (clk), .rst_n (rst_n),
+    .wr_valid (dec_valid && !dec_oor && dw_wr[1] && pool_alloc_ready),
+    .wr_idx (pool_alloc_idx), .wr_data (dw_data[1]),
+    .rd_valid (col_fire && !raw_block && (dir == DIR_WRITE)),
+    .rd_idx (issue_idx), .rd_data (wdata_out),
+    .err_no_data (err_wdata), .dbg_written (wdata_dbg)
+  );
 
   logic [N_BANK-1:0] col_grant;
 
@@ -509,7 +539,7 @@ module hbm4_pc_slice
 
   // Signals read only by assertions or intentionally left open.
   /* verilator lint_off UNUSEDSIGNAL */
-  wire _unused = &{1'b0, pool_alloc_ready, pool_occ_lists, col_grant,
+  wire _unused = &{1'b0, pool_occ_lists, col_grant,
                    raw_forward, wbuf_occ, wbuf_ready, wbuf_coalesced,
                    err_wdata, wdata_dbg,
                    wb_dbg_valid, wb_dbg_tag, wb_dbg_be_full, wb_dbg_hash,

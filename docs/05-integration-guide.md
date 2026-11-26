@@ -1,6 +1,6 @@
 # 05 — Integration Guide
 
-**HBM4 Memory Controller · Rev 1.3**
+**HBM4 Memory Controller · Rev 1.4**
 
 For the SoC integrator. What to instantiate, what to connect, what to constrain, and the
 things that will bite you if you skip them.
@@ -41,6 +41,18 @@ hbm4_addr_slice #(.N_STACK(4)) u_slice (
 );
 ```
 
+> **Status (Rev 1.4):** these examples show the specified interface. As built, `hbm4_sys_top`
+> has two parameters: `RD_FIFO_DEPTH` (32) and `BOOT_DELAY_SHIFT` (0, for simulation only and
+> 0 in silicon). Geometry (`N_STACK`, `TQ_DEPTH`, `WBUF_DEPTH`, `SYSECC_EN`, `N_BG`, …) is set
+> in `hbm4_pkg`, not per instance. Its ports are flat arrays, not interface bundles: `clk` and
+> `rst_n` (there is no `clk_cfg` and no `warm_rst_n`); the configuration ports (`tcfg`, `lcfg`,
+> `cfg_*`, `irq_mask`); `boot_start` / `ctrl_ready` / `boot_failed`; the NHI as `req_*` /
+> `rsp_*` arrays of `N_PC_TOTAL`; the DFI as `dfi_*` arrays; the per-stack boot command path
+> (`dfi_mrs_*`, `phy_*`); and `perf_snapshot_req` / `perf_freeze` / `irq_status` / `irq`. There
+> is no APB port, because `hbm4_csr` is not integrated. `hbm4_addr_slice` takes no parameters,
+> and its `cfg` (`slice_cfg_t`) has no CSRs to mirror. See
+> [09 Release Notes](09-release-notes.md).
+
 ---
 
 ## 2. Parameters
@@ -61,6 +73,10 @@ hbm4_addr_slice #(.N_STACK(4)) u_slice (
 | `ROW_BITS`, `SID_BITS` | 15, 0 | must sum to 15 |
 | `SYSECC_EN` | 1 | affects capacity, column count, and the `div30` path |
 
+> **Status (Rev 1.4):** apart from `RD_FIFO_DEPTH`, a parameter of `hbm4_sys_top`, the
+> parameters that exist are `hbm4_pkg` parameters, not module parameters. `ECC_CACHE_ENTRIES`, `WD_SKEW`, `PG_GROUP`, `ROW_BITS`, `SID_BITS` and `STACK_ILV`
+> do not exist in the RTL.
+
 ### 2.2 Runtime — CSR, see [04-programming-guide.md](04-programming-guide.md)
 
 Address map mode, hash masks, all DRAM timing, refresh policy, scheduler policy, RAS
@@ -69,6 +85,10 @@ enables, power thresholds.
 > **Design rule:** anything that could plausibly need to change after tape-out is a CSR, not
 > a parameter. If you find yourself wanting a new parameter, check whether it should be a
 > register instead.
+
+> **Status (Rev 1.4):** there are no CSRs, because `hbm4_csr` is not integrated. DRAM timing,
+> hash masks, refresh and scheduler policy, and power thresholds arrive on `hbm4_sys_top`
+> input ports. Address-map mode and RAS enables do not exist.
 
 ---
 
@@ -80,6 +100,9 @@ enables, power thresholds.
 |---|---|---|
 | `clk_core` | 1.0 GHz (P) | Same clock as DFI `dfi_clk`. Drives all 256 slices **and all 256 NHI ports**. |
 | `clk_cfg` | 100–400 MHz | Asynchronous to `clk_core`; the only controller-internal CDC |
+
+> **Status (Rev 1.4):** the RTL has a single clock, `clk`. There is no `clk_cfg` domain and no
+> controller-internal CDC; the only crossing is the PHY boundary.
 
 ### 3.1 The NHI clock constraint — read this before committing to a floorplan
 
@@ -121,6 +144,9 @@ map and corrupts memory.
 
 Deassert order: `clk_cfg` domain first, then `clk_core`. The supervisor holds slices in
 reset until boot completes regardless, so the ordering requirement is a belt-and-braces one.
+
+> **Status (Rev 1.4):** only `rst_n` exists. There is no `warm_rst_n`, no CSR state to retain
+> and no DVFS. After any reset the full boot sequence must run (mandatory requirement 1 below).
 
 ---
 
@@ -164,6 +190,10 @@ Three defences, all of which you should keep:
 3. The driver programs CSRs and fabric from **one source struct**, then sets `AMAP_LOCK`
    before enabling traffic.
 
+> **Status (Rev 1.4):** there are no CSRs and no `AMAP_LOCK`. Drive the slicer's `cfg` and the
+> controller's `lcfg` (and `tcfg`) from one source, before `boot_start`, and hold them stable.
+> Nothing in the RTL refuses a later change.
+
 ---
 
 ## 7. DFT
@@ -178,6 +208,11 @@ Not provided; insert per your methodology. Points to plan for:
 | Script RAM | 4 × 2 KB — MBIST; also loadable via APB, so functionally testable |
 | Timing counters | scan; consider a lightweight observation mux for silicon debug |
 | Clock gating | scan-enable must override every gate in the slice |
+
+> **Status (Rev 1.4):** as built there is no ECC column cache and no script RAM. The boot script
+> is a ROM (`hbm4_seq_rom`), and the write buffer holds hazard tags, not data. Per slice, the
+> large storage is flop-based: the transaction pool and the write-data RAM (`hbm4_wdata_ram`,
+> 64 × 32 B).
 
 The 256-way replication is a DFT opportunity: one slice's test patterns broadcast across all
 256, with compression on the response. Plan for it rather than treating each slice
@@ -194,6 +229,10 @@ independently.
 | SRAM | 1 MB write buffer + 256 KB ECC cache, distributed per slice. Do not aggregate — locality is why the wires are short. |
 | Power | Refresh phase assignment (globally staggered) already smooths the largest correlated current event. ZQ is also staggered. |
 | Congestion | The DFI bundle is ~600 wires per PC. Route it as a hard bundle from slice to PHY. |
+
+> **Status (Rev 1.4):** there is no SRAM. The write buffer holds no data, and there is no ECC
+> cache. The measured critical path is a cross-module path, not the column arbiter, and it does
+> not close at 1 GHz. See [syn/README.md](../syn/README.md).
 
 ---
 
@@ -230,6 +269,11 @@ independently.
 - [ ] `AMAP_LOCK` set before traffic
 - [ ] ECC region initialisation completed
 - [ ] Performance floors recorded as regression gates
+
+> **Status (Rev 1.4):** items that name CSRs, APB, `clk_cfg`, `warm_rst_n`, `AMAP_LOCK`,
+> `ROW_BITS` / `SID_BITS` or ECC region initialisation refer to parts of the specification that
+> are not in the RTL (see the notes above). The boot flow that exists is the port handshake in
+> [04-programming-guide.md](04-programming-guide.md#rev-10--boot-handshake).
 
 ---
 
@@ -277,12 +321,19 @@ Link-ECC retry has no usable re-issue path (OPEN-9). Enabling it suppresses resp
 nothing will ever re-drive, turning a correctable link event into a host hang. Link
 uncorrectables are reported to the host as errors, which is the supported behaviour.
 
+> **Status (Rev 1.4):** `cfg_retry_en` is tied to 0 inside `hbm4_pc_slice`, and there is no
+> port to change it.
+
 ### 4. Set `AMAP_LOCK` before enabling traffic
 
 Changing the address map, hash masks, `ECC_EN` or the timing set while traffic runs silently
 relocates where addresses map. There is no error for it — writes land in one place and later
 reads look in another. Set the lock once at boot; post-lock writes are refused with `pslverr`
 and an interrupt.
+
+> **Status (Rev 1.4):** there is no `AMAP_LOCK`, because `hbm4_csr` is not integrated. The rule
+> still holds for the configuration ports: set `tcfg`, `lcfg` and the slicer's `cfg` before
+> `boot_start` and never change them while traffic runs. Nothing will stop you.
 
 ### 5. Do not aggregate the NHI ports back into a crossbar
 
@@ -297,3 +348,6 @@ design physically closeable.
 The init sequence includes ~200 µs of settling waits plus ECC-region initialisation
 (~31 ms at full rate for 256 GB). `BOOT_DELAY_SHIFT` scales the waits **for simulation only**
 and must be zero in silicon.
+
+> **Status (Rev 1.4):** ECC-region initialisation is not part of boot, because `hbm4_ecc_init`
+> is not integrated, so boot time is the settling waits.

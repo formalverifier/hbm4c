@@ -5,15 +5,16 @@
 // host's write data and the DRAM.  If it returns the wrong entry, the wrong
 // bytes are written to a correct address: silent corruption with no error
 // anywhere, which is the failure class this whole design works hardest to
-// exclude.
+// exclude.  Since Rev 1.4 it is indexed by POOL ENTRY (tqidx_t), not by the
+// host's tag -- see the RTL header for why.
 //
-// The data-integrity proof tracks ONE SYMBOLIC TAG.  That technique failed on
-// hbm4_rd_ptr_fifo (OPEN-6) because a ring FIFO's entry lifetime depends on two
-// pointers and a count, and the invariant tying them together was not reachable
-// in three attempts.  Here it works, and the reason is worth stating: this is a
-// flat RAM, so mem[t] is written by exactly one condition -- wr_valid with
-// wr_tag == t -- and nothing else can disturb it.  There is no ordering state to
-// strengthen over.
+// The data-integrity proof shadows EVERY entry (see DW below).  A single
+// symbolic entry -- the technique that also failed on hbm4_rd_ptr_fifo
+// (OPEN-6) -- was defeated here because the invariant became conditional on the
+// environment addressing the tracked entry.  This is a flat RAM, so mem[i] is
+// written by exactly one condition -- wr_valid with wr_idx == i -- and nothing
+// else can disturb it.  It still runs as BMC rather than prove: see
+// wdataram.sby (OPEN-12).
 // ---------------------------------------------------------------------------
 module fv_wdata_ram
   import hbm4_pkg::*;
@@ -28,10 +29,10 @@ module fv_wdata_ram
   input logic clk,
   input logic rst_n,
   input logic wr_valid,
-  input tag_t wr_tag,
+  input tqidx_t wr_idx,
   input logic [DW-1:0] wr_data,
   input logic rd_valid,
-  input tag_t rd_tag
+  input tqidx_t rd_idx
 );
 
   logic [DW-1:0] rd_data;
@@ -40,8 +41,8 @@ module fv_wdata_ram
 
   hbm4_wdata_ram #(.DW(DW)) dut (
     .clk (clk), .rst_n (rst_n),
-    .wr_valid (wr_valid), .wr_tag (wr_tag), .wr_data (wr_data),
-    .rd_valid (rd_valid), .rd_tag (rd_tag), .rd_data (rd_data),
+    .wr_valid (wr_valid), .wr_idx (wr_idx), .wr_data (wr_data),
+    .rd_valid (rd_valid), .rd_idx (rd_idx), .rd_data (rd_data),
     .err_no_data (err_no_data), .dbg_written (dbg_written)
   );
 
@@ -50,7 +51,7 @@ module fv_wdata_ram
   always @(*) if (!f_past_valid) assume (!rst_n);
   always @(posedge clk) if (f_past_valid) assume (rst_n);
 
-  // ---- shadow model of one arbitrary tag ----------------------------------
+  // ---- shadow model of every entry ----------------------------------
   // Written independently of the DUT: it records what the INTERFACE promised,
   // not what the DUT stored, so the two can disagree.
   logic [DW-1:0]       f_shadow [TQ_DEPTH];
@@ -61,10 +62,10 @@ module fv_wdata_ram
       f_has <= '0;
     end else begin
       for (int unsigned i = 0; i < TQ_DEPTH; i++) begin
-        if (wr_valid && (32'(wr_tag) == 32'(i))) begin
+        if (wr_valid && (32'(wr_idx) == 32'(i))) begin
           f_shadow[i] <= wr_data;
           f_has[i]    <= 1'b1;
-        end else if (rd_valid && (32'(rd_tag) == 32'(i))) begin
+        end else if (rd_valid && (32'(rd_idx) == 32'(i))) begin
           f_has[i]    <= 1'b0;
         end
       end
@@ -73,8 +74,8 @@ module fv_wdata_ram
 
   // ---- P-WD-1: the entry read is the entry written --------------------------
   always @(*)
-    if (f_past_valid && rst_n && f_has[rd_tag])
-      p_data_integrity: assert (rd_data == f_shadow[rd_tag]);
+    if (f_past_valid && rst_n && f_has[rd_idx])
+      p_data_integrity: assert (rd_data == f_shadow[rd_idx]);
 
   // ---- P-WD-2: the written-flag mirrors the shadow --------------------------
   // The strengthening invariant. Without it p_data_integrity is not inductive:
@@ -86,25 +87,26 @@ module fv_wdata_ram
 
   // ---- P-WD-3: issuing a write with no data is REPORTED ---------------------
   // A write that reaches the DRAM carrying whatever the RAM happened to hold is
-  // corruption. It is a host-protocol violation (docs/03 H3), so the controller
-  // cannot prevent it -- but it must never be silent.
+  // corruption. Since Rev 1.4 the slice stores data in the same cycle the pool
+  // allocates the entry, so this can only be an internal fault -- a lost store
+  // or a wrong index -- and it must never be silent.
   always @(*)
-    if (f_past_valid && rst_n && rd_valid && !dbg_written[rd_tag])
+    if (f_past_valid && rst_n && rd_valid && !dbg_written[rd_idx])
       p_no_data_flagged: assert (err_no_data);
 
   always @(*)
-    if (f_past_valid && rst_n && rd_valid && dbg_written[rd_tag])
+    if (f_past_valid && rst_n && rd_valid && dbg_written[rd_idx])
       p_no_false_alarm: assert (!err_no_data);
 
   // ---- anti-vacuity ---------------------------------------------------------
   // Every property above is guarded. Without these covers, a configuration in
-  // which f_tag is never written makes all four hold trivially -- the trap that
+  // which no entry is ever written makes all four hold trivially -- the trap that
   // has caught this project five times (formal/SCALING.md 3, 5a).
   always @(*) if (f_past_valid && rst_n) begin
     c_written  : cover (|f_has);
-    c_read_back: cover (f_has[rd_tag] && rd_valid);
+    c_read_back: cover (f_has[rd_idx] && rd_valid);
     c_err      : cover (err_no_data);
-    c_reuse    : cover (wr_valid && rd_valid && (wr_tag == rd_tag));
+    c_reuse    : cover (wr_valid && rd_valid && (wr_idx == rd_idx));
   end
 
 endmodule

@@ -11,7 +11,7 @@ import random
 import cocotb
 from cocotb.triggers import RisingEdge, ClockCycles
 
-from testbench import setup, N_BANK, N_COL_DATA
+from testbench import setup, N_BANK, N_COL_DATA, TQ_DEPTH, TAG_W
 from hbm4_dram_model import TimingViolation
 
 
@@ -158,6 +158,115 @@ async def test_write_read_data(dut):
         f"the DRAM holds {len(stored)} blocks but not the values written: "
         f"got {stored[:4]}..., expected {expect[:4]}...")
     dut._log.info(f"{len(stored)} blocks written and verified byte-exact -> "
+                  f"{model.stats()}")
+
+
+async def _send_tagged(drv, dut, tag, blk, data):
+    """One write with a CHOSEN tag -- NhiDriver.send picks tags itself, and the
+    whole point here is to pick colliding ones. Credits are still honoured."""
+    while drv.credits <= 0:
+        await RisingEdge(dut.clk)
+    dut.req_valid.value = 1
+    dut.req_wr.value = 1
+    dut.req_blk.value = blk
+    dut.req_tag.value = tag
+    dut.req_qos.value = 0
+    dut.req_data.value = data
+    await RisingEdge(dut.clk)
+    dut.req_valid.value = 0
+    drv.credits -= 1
+
+
+@cocotb.test()
+async def test_write_data_tag_independence(dut):
+    """Write data must follow the TRANSACTION, never the host's tag.
+
+    Until Rev 1.4 hbm4_wdata_ram was indexed by req_tag. At production geometry
+    a tag is 8 bits and the RAM has TQ_DEPTH = 64 entries, so the index was
+    silently truncated and tags t and t+64 shared an entry. And docs/03 rule H2
+    requires tags to be unique among outstanding READS only, so a conforming
+    host may also reuse one tag across outstanding writes. Either way a later
+    write overwrote an earlier write's data while it was still queued, and the
+    earlier write then put the wrong bytes at a correct address -- with no error
+    anywhere. Formal could not see it: under FV_SMALL the tag is exactly as wide
+    as the pool index. The other tests could not either: their driver keeps
+    tags small and unique.
+
+    Both collision patterns are driven here with every write outstanding at
+    once, and every block must reach the DRAM byte-exact, exactly once.
+    """
+    # Gate CLOSED while sending: requests are accepted but nothing issues, so
+    # every write in the plan is provably outstanding at the same time. Without
+    # that, a write could issue before its collider arrived and the test would
+    # pass against the broken design.
+    drv, mon, model, rdret = await setup(dut, open_gate=False)
+
+    err_cycles = []
+
+    async def watch_no_data():
+        # hbm4_wdata_ram's own alarm: a write issued from an entry that holds no
+        # data. With per-transaction storage it must never fire.
+        while True:
+            await RisingEdge(dut.clk)
+            if dut.rst_n.value and int(dut.u_dut.err_wdata.value):
+                err_cycles.append(mon.cycle)
+
+    cocotb.start_soon(watch_no_data())
+
+    rng = random.Random(0x7A6)
+    plan = []                                   # (tag, blk, data)
+    # (1) One tag on several outstanding writes -- legal under H2 as written.
+    for _ in range(min(4, TQ_DEPTH)):
+        plan.append((1, len(plan), rng.getrandbits(256)))
+    # (2) Tags that are all DIFFERENT but congruent modulo TQ_DEPTH -- legal
+    # under any reading of H2, and they collided anyway through the truncated
+    # index. Needs a tag space wider than the pool: production geometry only.
+    if (1 << TAG_W) > TQ_DEPTH:
+        for t in range(8, 24):
+            for tag in (t, t + TQ_DEPTH):
+                plan.append((tag, len(plan), rng.getrandbits(256)))
+    assert len(plan) <= TQ_DEPTH, "plan exceeds the credit allowance"
+
+    for tag, blk, data in plan:
+        await _send_tagged(drv, dut, tag, blk, data)
+    await ClockCycles(dut.clk, 4)      # past the two-cycle decode, into the pool
+
+    # Anti-vacuity: all of them held in the transaction pool together, none
+    # issued. Read the pool's own occupancy, not the `occupancy` port: that is
+    # the NHI's count of accepted requests, equal to len(plan) by construction,
+    # so a check on it could never fail.
+    assert not [c for c in drv.completed if c[3]], \
+        "a write completed while the boot gate was closed"
+    pool_occ = int(dut.u_dut.pool_occ.value)
+    assert pool_occ == len(plan), (
+        f"only {pool_occ} of {len(plan)} writes held in the pool at once -- "
+        f"the collision this test exists for never happened")
+
+    dut.cmd_en.value = 1
+    for _ in range(20000):
+        await RisingEdge(dut.clk)
+        if sum(1 for c in drv.completed if c[3]) >= len(plan):
+            break
+    n_ack = sum(1 for c in drv.completed if c[3])
+    assert n_ack == len(plan), f"only {n_ack} of {len(plan)} writes completed"
+    await ClockCycles(dut.clk, 50)
+
+    assert not model.violations, f"timing violations: {model.violations[:3]}"
+    assert model.n_wr == len(plan), \
+        f"{model.n_wr} column writes reached the DRAM for {len(plan)} requests"
+    # Every value is distinct, so any write that carried another write's data
+    # shows up as one value missing and another duplicated.
+    stored = sorted(v for v in model.array.values() if v is not None)
+    expect = sorted(d for (_, _, d) in plan)
+    assert stored == expect, (
+        f"{sum(1 for d in expect if d not in stored)} of {len(plan)} blocks "
+        f"hold another write's data")
+    # Checked second: the data above is the symptom; this is the RAM's own
+    # alarm, and it must stay silent too.
+    assert not err_cycles, (
+        f"a write issued with no data in its entry (first at DFI cycle "
+        f"{err_cycles[0]}) -- write data is not tracked per transaction")
+    dut._log.info(f"{len(plan)} colliding-tag writes, all byte-exact -> "
                   f"{model.stats()}")
 
 

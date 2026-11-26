@@ -1,6 +1,7 @@
 # Formal Scaling Argument
 
-**Rev 1.0** · reviewed at each signoff (verification plan criterion S5)
+**Rev 1.4** · reviewed at each signoff (verification plan criterion S5). Rev 1.4 added §5b and
+updated the counts and the coverage table.
 
 Proofs run at reduced geometry (`FV_SMALL`). This document is the argument that results at
 that scale say something about production silicon.
@@ -117,8 +118,9 @@ addresses**. For those blocks the scaling argument below is not load-bearing at 
 is no gap to bridge.
 
 `FV_SMALL` is retained because it runs in seconds rather than minutes, which is what makes
-`mutate.sh` viable as a per-push gate — 70 mutations across 21 blocks is only tractable at
-reduced scale.
+`mutate.sh` viable as a per-push gate — 77 mutations across 21 blocks is only tractable at
+reduced scale. (The full-scale timing and address-map proofs still close: re-run with
+`FV_DEFINES=` for Rev 1.4, both pass unbounded at production geometry in under four minutes.)
 
 The three legs below apply to blocks that cannot close at full scale: as of Rev 0.7g those
 are the transaction pool, the read-pointer FIFO, the ECC codec and link ECC, all of which are
@@ -135,10 +137,16 @@ expressions, never in a comparison or a case arm. Verified by inspection at each
 
 ### 4.2 Full-scale BMC (medium)
 
-`make FV_DEFINES=` runs every proof at production geometry in `mode bmc`. This catches
-anything genuinely width-dependent: a truncation, an overflowing counter, a field offset
-that only misbehaves at a larger width. It does **not** prove absence of deep bugs — that is
-what the small-scale unbounded proof is for.
+**Rev 1.4: this leg does not exist as described.** `FV_DEFINES=` only changes the geometry the
+RTL is built at; each `.sby` keeps its own modes (`prove`, `bmc`, `cover`) and depths, and
+nothing runs a full-scale BMC at depth ≥ 40. What has been run at production geometry is the
+timing-engine and address-map proofs, in their `prove` mode, both passing unbounded. The rest of
+this paragraph is the intent.
+
+A full-scale `mode bmc` run of every proof would catch anything genuinely width-dependent: a
+truncation, an overflowing counter, a field offset that only misbehaves at a larger width. It
+does **not** prove absence of deep bugs — that is what the small-scale unbounded proof is for.
+For the one width bug this project has had (§5b), production-geometry lint caught it.
 
 > The two legs are complementary, and neither alone is sufficient. Small-scale `prove` gives
 > depth without width; full-scale `bmc` gives width without depth.
@@ -163,9 +171,11 @@ bounded-checked at 32, with a human argument bridging the two.*
 | RAA overshoot bound | ASSUMPTIONS.md OPEN-5 (system-level) |
 | ECC symbol correction (SEC-DED only) | ASSUMPTIONS.md OPEN-7 |
 | Pool / read-FIFO order proved bounded, not unbounded | ASSUMPTIONS.md OPEN-4, OPEN-6 |
-| Integration: PC slice, stack | written and **simulated** (Rev 1.0): 10/10 slice, 6/6 stack boot |
-| Integration: **system top** | written and linted; **never simulated** |
-| Multi-pseudo-channel and multi-stack interaction | simulation only, by design — and the multi-stack half is still unwritten |
+| Integration: PC slice, stack | **simulated** (Rev 1.4): 12/12 slice at production geometry, 6/6 stack boot at reduced geometry. No proof covers either (ASSUMPTIONS.md OPEN-14) |
+| Integration: **system top** | simulated at **reduced geometry only** (2 stacks, 8 slices), boot and control, 5/5. The 256-slice system lints clean but has **never been simulated** |
+| Multi-pseudo-channel and multi-stack interaction | simulation only, by design. Multi-stack boot and control are covered; multi-stack **data traffic** is still unwritten |
+| Out-of-range request completion | ASSUMPTIONS.md OPEN-13 — requests are dropped, not answered |
+| Index-width truncation (tag wider than the index it selects) | **invisible at `FV_SMALL` by construction** — see §5b |
 | ~~Reset behaviour (assumption A1)~~ | **DISCHARGED in Rev 1.0** — power-on and mid-operation both tested |
 | Clock-domain crossings | no open-source tool; hand review (see verification plan §7) |
 
@@ -210,6 +220,32 @@ make guarded              # takes .sby.lock, refuses to start a second run
 Both this and the staleness hazard above share a root cause worth naming: **the build products
 are shared mutable state, and a proof that reads the wrong ones still reports PASS.** Every
 guard in this flow exists because a wrong answer here is green, not red.
+
+---
+
+## 5b. A fifth instance: a tag exactly as wide as the index (Rev 1.4)
+
+Rev 1.3 stored write data in `hbm4_wdata_ram` indexed by the host's `req_tag`. At production
+geometry a tag is **8 bits** and the RAM has `TQ_DEPTH` = **64** entries, so the index was
+silently truncated and tags *t* and *t*+64 shared an entry. A queued write's data was
+overwritten by a later write, and the earlier write stored the wrong bytes at a correct address.
+
+Under `FV_SMALL` a tag is **2 bits** and `TQ_DEPTH` is **4**, so a tag is exactly as wide as a
+pool index. **Truncation cannot occur in the reduced configuration at all.** It is the §3
+mistake again, a reduced configuration that cannot reach the state that matters, except that
+this time the narrowing was a deliberate solver-state saving (`TAG_W` "is opaque payload")
+whose side effect nobody re-examined when the tag gained a second use as an address.
+
+What caught it: Verilator `-Wall` **at production geometry** (`WIDTHTRUNC` on every index into
+the RAM) and a production-geometry simulation, `test_write_data_tag_independence`. Neither
+proofs nor mutation testing could have, because both run at `FV_SMALL`.
+
+**The rule this adds:** a narrowing in `FV_SMALL` is only safe while the narrowed value stays
+opaque. When a narrowed field starts selecting storage, the reduced configuration must keep
+that field strictly **wider** than the thing it indexes, or the production-geometry lint and a
+production-geometry test must be gates. Rev 1.4 removed the dependency instead: write data is
+indexed by pool entry (`alloc_idx` / `issue_idx`), which is always exactly as wide as the RAM it
+indexes.
 
 ---
 
